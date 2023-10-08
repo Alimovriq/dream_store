@@ -6,7 +6,27 @@ from django.db.models import UniqueConstraint
 USER = get_user_model()
 
 
-class Categories(models.Model):
+class BasicMetaData(models.Model):
+    """
+    Базовая модель с мета полями для классов.
+    """
+
+    meta_title = models.CharField(
+        verbose_name='Мета-название страницы',
+        max_length=255,
+        blank=True,
+        null=True)
+    meta_description = models.CharField(
+        verbose_name='Мета-описание страницы',
+        max_length=255,
+        blank=True,
+        null=True)
+
+    class Meta:
+        abstract = True
+
+
+class Categories(BasicMetaData):
     """
     Категории для товаров.
     """
@@ -20,6 +40,11 @@ class Categories(models.Model):
         help_text='Введите описание категории',
         blank=True,
         verbose_name='Описание')
+    image = models.ImageField(
+        verbose_name='Изображение',
+        null=True,
+        blank=True,
+        upload_to='categories/')
     slug = models.SlugField(
         unique=True,
         max_length=50,
@@ -33,7 +58,7 @@ class Categories(models.Model):
         return self.name
 
 
-class Products(models.Model):
+class Products(BasicMetaData):
     """
     Модель товаров.
     """
@@ -53,6 +78,11 @@ class Products(models.Model):
         on_delete=models.CASCADE,
         help_text='Выберите категорию',
         verbose_name='Категория')
+    image = models.ImageField(
+        verbose_name='Изображение',
+        null=True,
+        blank=True,
+        upload_to='products/')
     description = models.TextField(
         max_length=500,
         blank=True,

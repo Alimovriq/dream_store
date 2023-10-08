@@ -27,11 +27,13 @@ class ProductsAdmin(admin.ModelAdmin):
         'price',
         'category',
         'description',
+        'meta_title',
+        'meta_description',
         'slug',
     )
     list_filter = ('name',)
     search_fields = ('name',)
-    list_editable = ('price', 'description',)
+    list_editable = ('price', 'description')
     ordering = ('-name',)
 
 
@@ -61,6 +63,8 @@ class CategoriesAdmin(admin.ModelAdmin):
         'pk',
         'name',
         'description',
+        'meta_title',
+        'meta_description',
         'slug',
     )
     list_filter = ('name',)
@@ -78,11 +82,53 @@ class ShopBasketAdmin(admin.ModelAdmin):
     list_display = (
         'pk',
         'customer',
+        'count_products',
+        'total_price',
     )
     list_filter = ('customer',)
     filter_horizontal = ('products',)
     search_fields = ('customer',)
     inlines = (ShopBasketProductInline,)
+
+    @admin.display(description='Количество позиций в корзине')
+    def count_products(self, obj):
+        """
+        Отображает кол-во товаров в корзине.
+        """
+
+        cartitem = Shop_basket_items.objects.filter(shop_basket=obj)
+        quantity = 0
+        for item in cartitem:
+            if item.product:
+                quantity += 1
+        return quantity
+
+    @admin.display(description='Итоговая стоимость в руб.')
+    def total_price(self, obj):
+        """
+        Отображает итоговую стоимость товаров в корзине.
+        """
+
+        cartitem = Shop_basket_items.objects.filter(shop_basket=obj)
+        total = 0
+        for item in cartitem:
+            if item.product:
+                total += item.product.price * item.quantity
+        return total
+
+    # @admin.display(description='Товары в корзине')
+    # def display_products(self, obj):
+    #     """
+    #     Отображает товары в корзине
+    #     """
+
+    #     cartitem = Shop_basket_items.objects.filter(shop_basket=obj)
+    #     print(cartitem)
+    #     print("HELLO")
+    #     products_list = []
+    #     for item in cartitem:
+    #         products_list.append(item.product.name)
+    #     return products_list
 
 
 @admin.register(Shop_basket_items)
