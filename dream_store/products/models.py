@@ -1,6 +1,6 @@
 from django.contrib.auth import get_user_model
+from django.core.exceptions import ValidationError
 from django.db import models
-from django.db.models import UniqueConstraint
 
 
 USER = get_user_model()
@@ -174,6 +174,16 @@ class Shop_basket_items(models.Model):
     def __str__(self) -> str:
         return f'Объект корзины с {self.product} в кол-ве {self.quantity} ед.'
 
+    def clean(self):
+        """
+        Проверка на количество товара на складе.
+        """
+
+        queryset = ProductQuantity.objects.filter(product=self.product)
+        if self.quantity > queryset.first().stock:
+            raise ValidationError(
+                f'Недостаточное количество товара {self.product.name} в наличии.')
+
 
 class Orders(models.Model):
     """
@@ -243,15 +253,33 @@ class OrderItems(models.Model):
     def __str__(self) -> str:
         return f'{self.product.name} ({self.quantity})'
 
+    def clean(self):
+        """
+        Проверка на количество товара на складе.
+        """
+
+        queryset = ProductQuantity.objects.filter(product=self.product)
+        if self.quantity > queryset.first().stock:
+            raise ValidationError(
+                f'Недостаточное количество товара {self.product.name} в наличии.')
+
     def save(self, *args, **kwargs):
         """
-        Обновление итоговой стоимости заказа.
+        Обновление итоговой стоимости заказа и вычитание кол-ва со склада.
         """
 
         if self.order:
-            queryset = Orders.objects.filter(pk=self.order.pk)
-            order_obj = queryset.first()
+            queryset_order = Orders.objects.filter(pk=self.order.pk)
+            queryset_product_quantity = ProductQuantity.objects.filter(
+                product=self.product)
+            order_obj = queryset_order.first()
             order_obj.total_price += (
                 self.product.price * self.quantity)
+            if queryset_product_quantity:
+                # Если найден кьюрисет в модели ProductQuantity,
+                # то убавляем кол-во
+                product_quantity_obj = queryset_product_quantity.first()
+                product_quantity_obj.stock -= self.quantity
+                product_quantity_obj.save()
             order_obj.save()
         return super().save(*args, **kwargs)
