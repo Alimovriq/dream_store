@@ -80,6 +80,7 @@ class Products(BasicMetaData):
         verbose_name='Категория')
     image = models.ImageField(
         verbose_name='Изображение',
+        help_text='Добавить изображние для поста',
         null=True,
         blank=True,
         upload_to='products/')

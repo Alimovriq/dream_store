@@ -1,4 +1,6 @@
-from django.contrib import admin
+from django.contrib import admin, messages
+from django.utils.translation import ngettext
+from django.utils.html import format_html
 
 from .models import (
     Products, ProductQuantity, Categories,
@@ -27,6 +29,7 @@ class ProductsAdmin(admin.ModelAdmin):
         'price',
         'category',
         'description',
+        'image_preview',
         'meta_title',
         'meta_description',
         'slug',
@@ -35,6 +38,15 @@ class ProductsAdmin(admin.ModelAdmin):
     search_fields = ('name',)
     list_editable = ('price', 'description')
     ordering = ('-name',)
+
+    @admin.display(description='Изображение')
+    def image_preview(self, obj):
+        try:
+            return format_html(
+                '<img src="{}" style="max-width:50px; max-height:50px"/>'.format(
+                    obj.image.url))
+        except ValueError:
+            pass
 
 
 @admin.register(ProductQuantity)
