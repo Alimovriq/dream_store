@@ -1,5 +1,4 @@
-from django.contrib import admin, messages
-from django.utils.translation import ngettext
+from django.contrib import admin
 from django.utils.html import format_html
 
 from .models import (
