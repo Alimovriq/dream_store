@@ -1,6 +1,9 @@
 from django.db import models
 from django.utils import timezone
-from django.contrib.auth.models import BaseUserManager, AbstractBaseUser
+from django.contrib.auth.models import (
+    BaseUserManager,
+    AbstractBaseUser,
+    PermissionsMixin)
 
 
 class MainUserManager(BaseUserManager):
@@ -8,7 +11,7 @@ class MainUserManager(BaseUserManager):
     Менеджер для пользователей.
     """
 
-    def create_user(self, email, password=None):
+    def create_user(self, email, password=None, **extra_fields):
         """
         Создает и возвращает пользователя c email и паролем.
         """
@@ -17,9 +20,12 @@ class MainUserManager(BaseUserManager):
             raise ValueError('У пользователя должен быть email')
 
         user = self.model(
-            email=self.normalize_email(email))
+            email=self.normalize_email(email), **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
+
+        UserProfile.objects.create(user=user)
+
         return user
 
     def create_superuser(self, email, password=None):
@@ -28,13 +34,15 @@ class MainUserManager(BaseUserManager):
         """
 
         user = self.create_user(email, password)
+        user.is_active = True
         user.is_staff = True
         user.is_superuser = True
         user.save(using=self._db)
+
         return user
 
 
-class CustomUser(AbstractBaseUser):
+class User(AbstractBaseUser, PermissionsMixin):
     """
     Облегченная модель для пользователя.
     """
@@ -43,6 +51,8 @@ class CustomUser(AbstractBaseUser):
         verbose_name='Электронная почта',
         max_length=255,
         unique=True)
+    is_active = models.BooleanField(
+        verbose_name='Активен', default=True)
     is_staff = models.BooleanField(
         verbose_name='Персонал', default=False)
     date_joined = models.DateTimeField(
@@ -66,7 +76,9 @@ class UserProfile(models.Model):
     Профиль пользователя с необходимыми полями.
     """
 
-    user = models.OneToOneField(CustomUser, on_delete=models.CASCADE)
+    user = models.OneToOneField(User,
+                                verbose_name='Пользователь',
+                                on_delete=models.CASCADE)
     first_name = models.CharField(
         verbose_name='Имя',
         max_length=255,
@@ -78,10 +90,6 @@ class UserProfile(models.Model):
     about = models.TextField(
         verbose_name='О себе',
         max_length=500,
-        blank=True)
-    telephone = models.IntegerField(
-        verbose_name='Контактный телефон',
-        max_length=12,
         blank=True)
 
     class Meta:
