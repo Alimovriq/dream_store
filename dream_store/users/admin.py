@@ -35,7 +35,7 @@ admin.site.register(User, UserAdmin)
 @admin.register(UserProfile)
 class UserProfileAdmin(admin.ModelAdmin):
     """
-    Админа для профилей пользователей.
+    Админка для профилей пользователей.
     """
 
     list_display = (
