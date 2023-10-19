@@ -68,7 +68,7 @@ class Products(BasicMetaData):
         help_text='Введите название товара',
         verbose_name='Наименование')
     price = models.DecimalField(
-        max_digits=6,
+        max_digits=10,
         decimal_places=2,
         default=1,
         help_text='Укажите стоимость товара',
