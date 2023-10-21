@@ -1,7 +1,9 @@
-from django.http import HttpResponse, JsonResponse
+# from django.http import HttpResponse, JsonResponse
 from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
-from products.models import Products
+from rest_framework.response import Response
+from rest_framework import status
+from products.models import Products, Categories
 from api.serializers.products_serializers import ProductsSerializer
 
 
@@ -12,15 +14,50 @@ def products_list(request):
     """
 
     if request.method == 'GET':
-        # Надо при запросе в поле Category возвращать все строки экземпляра.
         products = Products.objects.all()
         serializer = ProductsSerializer(products, many=True)
-        return JsonResponse(serializer.data, safe=False)
+        return Response(serializer.data)
 
     elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = ProductsSerializer(data=data)
+        data_parsed = JSONParser().parse(request)
+        serializer = ProductsSerializer(data=data_parsed)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
+def products_detail(request, slug):
+    """
+    Позволяет получить конкретную запись, перезаписать, изменить, удалить.
+    """
+
+    try:
+        product = Products.objects.get(slug=slug)
+    except Products.DoesNotExist:
+        return Response(status=status.HTTP_404_NOT_FOUND)
+
+    if request.method == 'GET':
+        serializer = ProductsSerializer(product)
+        return Response(serializer.data)
+
+    elif request.method == 'PUT':
+        data_parsed = JSONParser().parse(request)
+        serializer = ProductsSerializer(product, data=data_parsed)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'PATCH':
+        data_parsed = JSONParser().parse(request)
+        serializer = ProductsSerializer(product, data=data_parsed)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    elif request.method == 'DELETE':
+        product.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)

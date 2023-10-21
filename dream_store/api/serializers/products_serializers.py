@@ -28,6 +28,20 @@ class Base64ImageField(serializers.ImageField):
         return super().to_internal_value(data)
 
 
+class CategoriesSerializer(serializers.Serializer):
+    """
+    Сериализует данные для категорий.
+    """
+
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(required=True, max_length=255)
+    description = serializers.CharField(required=False, max_length=255)
+    image = Base64ImageField(required=False)
+    slug = serializers.SlugField(required=True, max_length=50)
+    meta_title = serializers.CharField(required=False, max_length=255)
+    meta_description = serializers.CharField(required=False, max_length=255)
+
+
 class ProductsSerializer(serializers.Serializer):
     """
     Сериализует данные для товаров.
@@ -43,6 +57,7 @@ class ProductsSerializer(serializers.Serializer):
                                         max_length=500)
     category = serializers.SlugRelatedField(
         queryset=Categories.objects.all(), slug_field='name')
+    # category = CategoriesSerializer()
     slug = serializers.SlugField(required=True, max_length=50)
 
     def create(self, validated_data):
