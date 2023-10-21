@@ -41,6 +41,32 @@ class CategoriesSerializer(serializers.Serializer):
     meta_title = serializers.CharField(required=False, max_length=255)
     meta_description = serializers.CharField(required=False, max_length=255)
 
+    def create(self, validated_data):
+        """
+        Метод для создания и возврата объекта экземпляра от
+        входящих данных.
+        """
+
+        return Categories.objects.create(**validated_data)
+
+    def update(self, instance, validated_data):
+        """
+        Метод для обновления и возврата объекта экземпляра от
+        входящих данных.
+        """
+
+        instance.name = validated_data.get('name', instance.name)
+        instance.description = validated_data.get(
+            'description', instance.description)
+        instance.image = validated_data.get('image', instance.image)
+        instance.slug = validated_data.get('slug', instance.slug)
+        instance.meta_title = validated_data.get(
+            'meta_title', instance.meta_title)
+        instance.meta_description = validated_data.get(
+            'meta_description', instance.meta_description)
+        instance.save()
+        return instance
+
 
 class ProductsSerializer(serializers.Serializer):
     """
@@ -57,7 +83,6 @@ class ProductsSerializer(serializers.Serializer):
                                         max_length=500)
     category = serializers.SlugRelatedField(
         queryset=Categories.objects.all(), slug_field='name')
-    # category = CategoriesSerializer()
     slug = serializers.SlugField(required=True, max_length=50)
 
     def create(self, validated_data):
@@ -84,3 +109,20 @@ class ProductsSerializer(serializers.Serializer):
         instance.slug = validated_data.get('slug', instance.slug)
         instance.save()
         return instance
+
+
+class ProductsDetailSerializer(serializers.Serializer):
+    """
+    Сериализует данные для товаров с подробными
+    данными категории.
+    """
+
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(read_only=True)
+    price = serializers.DecimalField(max_digits=10,
+                                     decimal_places=2,
+                                     read_only=True)
+    image = Base64ImageField(read_only=True)
+    description = serializers.CharField(read_only=True)
+    category = CategoriesSerializer(read_only=True)
+    slug = serializers.SlugField(read_only=True)
