@@ -4,10 +4,10 @@ from django.core.files.base import ContentFile
 from rest_framework import serializers
 
 from products.models import (
-    Products, ProductQuantity,
+    Product, ProductQuantity,
     Shop_basket, Shop_basket_items,
-    Orders, OrderItems,
-    Categories)
+    Order, OrderItems,
+    Category)
 
 
 class Base64ImageField(serializers.ImageField):
@@ -17,6 +17,8 @@ class Base64ImageField(serializers.ImageField):
 
     def to_internal_value(self, data):
         """
+        Проверяет, что поступивший запрос соответствует
+        для декадирования изображения.
         Метод работает при поступлении запроса.
         """
 
@@ -28,7 +30,7 @@ class Base64ImageField(serializers.ImageField):
         return super().to_internal_value(data)
 
 
-class CategoriesSerializer(serializers.Serializer):
+class CategorySerializer(serializers.Serializer):
     """
     Сериализует данные для категорий.
     """
@@ -37,9 +39,18 @@ class CategoriesSerializer(serializers.Serializer):
     name = serializers.CharField(required=True, max_length=255)
     description = serializers.CharField(required=False, max_length=255)
     image = Base64ImageField(required=False)
+    total_products = serializers.SerializerMethodField(read_only=True)
     slug = serializers.SlugField(required=True, max_length=50)
     meta_title = serializers.CharField(required=False, max_length=255)
     meta_description = serializers.CharField(required=False, max_length=255)
+
+    def get_total_products(self, obj):
+        """
+        Поле с общим количеством товаров в данной категории.
+        """
+
+        products = Product.objects.filter(category=obj.id)
+        return products.count()
 
     def create(self, validated_data):
         """
@@ -47,7 +58,7 @@ class CategoriesSerializer(serializers.Serializer):
         входящих данных.
         """
 
-        return Categories.objects.create(**validated_data)
+        return Category.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         """
@@ -68,7 +79,29 @@ class CategoriesSerializer(serializers.Serializer):
         return instance
 
 
-class ProductsSerializer(serializers.Serializer):
+class CategoryDetailSerializer(serializers.Serializer):
+    """
+    Сериализует данные для категорий с дополнительным
+    полем общего количества товаров без мета-данных.
+    """
+
+    id = serializers.IntegerField(read_only=True)
+    name = serializers.CharField(read_only=True)
+    description = serializers.CharField(read_only=True)
+    image = Base64ImageField(read_only=True)
+    slug = serializers.SlugField(read_only=True)
+    total_products = serializers.SerializerMethodField(read_only=True)
+
+    def get_total_products(self, obj):
+        """
+        Поле с общим количеством товаров в данной категории.
+        """
+
+        products = Product.objects.filter(category=obj.id)
+        return products.count()
+
+
+class ProductSerializer(serializers.Serializer):
     """
     Сериализует данные для товаров.
     """
@@ -82,7 +115,7 @@ class ProductsSerializer(serializers.Serializer):
     description = serializers.CharField(required=False, allow_blank=True,
                                         max_length=500)
     category = serializers.SlugRelatedField(
-        queryset=Categories.objects.all(), slug_field='name')
+        queryset=Category.objects.all(), slug_field='name')
     slug = serializers.SlugField(required=True, max_length=50)
 
     def create(self, validated_data):
@@ -91,7 +124,7 @@ class ProductsSerializer(serializers.Serializer):
         входящих данных.
         """
 
-        return Products.objects.create(**validated_data)
+        return Product.objects.create(**validated_data)
 
     def update(self, instance, validated_data):
         """
@@ -111,7 +144,7 @@ class ProductsSerializer(serializers.Serializer):
         return instance
 
 
-class ProductsDetailSerializer(serializers.Serializer):
+class ProductDetailSerializer(serializers.Serializer):
     """
     Сериализует данные для товаров с подробными
     данными категории.
@@ -124,5 +157,5 @@ class ProductsDetailSerializer(serializers.Serializer):
                                      read_only=True)
     image = Base64ImageField(read_only=True)
     description = serializers.CharField(read_only=True)
-    category = CategoriesSerializer(read_only=True)
+    category = CategorySerializer(read_only=True)
     slug = serializers.SlugField(read_only=True)

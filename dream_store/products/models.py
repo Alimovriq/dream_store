@@ -1,3 +1,4 @@
+from tabnanny import verbose
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -26,7 +27,7 @@ class BasicMetaData(models.Model):
         abstract = True
 
 
-class Categories(BasicMetaData):
+class Category(BasicMetaData):
     """
     Категории для товаров.
     """
@@ -58,7 +59,48 @@ class Categories(BasicMetaData):
         return self.name
 
 
-class Products(BasicMetaData):
+class Brand(models.Model):
+    """
+    Модель брендов для товаров.
+    """
+
+    name = models.CharField(
+        max_length=255,
+        help_text='Введите название бренда',
+        verbose_name='Бренд')
+    description = models.TextField(
+        max_length=500,
+        help_text='Укажите описание',
+        verbose_name='Описание')
+
+    class Meta:
+        verbose_name = 'Бренд'
+        verbose_name_plural = 'Бренды'
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class CountryProduct(models.Model):
+    """
+    Модель для стран.
+    """
+
+    name = models.CharField(
+        max_length=255,
+        help_text='Введите название страны',
+        verbose_name='Название страны'
+    )
+
+    class Meta:
+        verbose_name = 'Страна',
+        verbose_name_plural = 'Страны'
+
+    def __str__(self) -> str:
+        return self.name
+
+
+class Product(BasicMetaData):
     """
     Модель товаров.
     """
@@ -73,8 +115,12 @@ class Products(BasicMetaData):
         default=1,
         help_text='Укажите стоимость товара',
         verbose_name='Стоимость')
+    brand = models.ForeignKey(
+        Brand,
+        on_delete=models.CASCADE,
+        verbose_name='Бренд')
     category = models.ForeignKey(
-        Categories,
+        Category,
         on_delete=models.CASCADE,
         help_text='Выберите категорию',
         verbose_name='Категория')
@@ -89,6 +135,10 @@ class Products(BasicMetaData):
         blank=True,
         help_text='Введите описание товара',
         verbose_name='Описание')
+    country = models.ForeignKey(
+        CountryProduct, on_delete=models.CASCADE,
+        help_text='Выберите страну производства',
+        verbose_name='Страна')
     slug = models.SlugField(
         unique=True,
         max_length=50,
@@ -108,7 +158,7 @@ class ProductQuantity(models.Model):
     """
 
     product = models.ForeignKey(
-                Products,
+                Product,
                 on_delete=models.CASCADE,
                 help_text='Выберите товар',
                 verbose_name='Товар')
@@ -130,7 +180,7 @@ class Shop_basket(models.Model):
     """
 
     products = models.ManyToManyField(
-        Products,
+        Product,
         through='Shop_basket_items',
         help_text='Выберите товар',
         verbose_name='Товары')
@@ -159,7 +209,7 @@ class Shop_basket_items(models.Model):
         help_text='Выберите корзину',
         verbose_name='Корзина')
     product = models.ForeignKey(
-        Products,
+        Product,
         on_delete=models.CASCADE,
         help_text='Выберите товар',
         verbose_name='Товар')
@@ -186,7 +236,7 @@ class Shop_basket_items(models.Model):
                 f'Недостаточное количество товара {self.product.name} в наличии.')
 
 
-class Orders(models.Model):
+class Order(models.Model):
     """
     Общая модель для заказов.
     """
@@ -197,7 +247,7 @@ class Orders(models.Model):
         help_text='Выберите пользователя(Покупатель)',
         verbose_name='Покупатель')
     products = models.ManyToManyField(
-        Products,
+        Product,
         through='OrderItems',
         help_text='Выберите товар',
         verbose_name='Товары')
@@ -233,12 +283,12 @@ class OrderItems(models.Model):
     """
 
     order = models.ForeignKey(
-        Orders,
+        Order,
         on_delete=models.CASCADE,
         help_text='Выберите заказ',
         verbose_name='Заказ')
     product = models.ForeignKey(
-        Products,
+        Product,
         on_delete=models.CASCADE,
         help_text='Выберите товар',
         verbose_name='Товар')
@@ -270,7 +320,7 @@ class OrderItems(models.Model):
         """
 
         if self.order:
-            queryset_order = Orders.objects.filter(pk=self.order.pk)
+            queryset_order = Order.objects.filter(pk=self.order.pk)
             queryset_product_quantity = ProductQuantity.objects.filter(
                 product=self.product)
             order_obj = queryset_order.first()

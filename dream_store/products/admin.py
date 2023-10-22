@@ -2,8 +2,9 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from .models import (
-    Products, ProductQuantity, Categories,
-    Shop_basket, Shop_basket_items, Orders, OrderItems)
+    Product, ProductQuantity, Category,
+    Shop_basket, Shop_basket_items,
+    Order, OrderItems, Brand, CountryProduct)
 
 
 class ShopBasketProductInline(admin.TabularInline):
@@ -16,8 +17,35 @@ class OrderProductInline(admin.TabularInline):
     extra = 1
 
 
-@admin.register(Products)
-class ProductsAdmin(admin.ModelAdmin):
+@admin.register(Brand)
+class BrandAdmin(admin.ModelAdmin):
+    """
+    Админка для брендов.
+    """
+
+    list_display = (
+        'pk',
+        'name',
+        'description',
+    )
+    list_filter = ('name',)
+    search_fields = ('name',)
+    ordering = ('-name',)
+
+
+@admin.register(CountryProduct)
+class CountryProducyAdmin(admin.ModelAdmin):
+    """
+    Админка для стран.
+    """
+    list_display = (
+        'pk',
+        'name',
+    )
+
+
+@admin.register(Product)
+class ProductAdmin(admin.ModelAdmin):
     """
     Админка для товаров.
     """
@@ -26,14 +54,16 @@ class ProductsAdmin(admin.ModelAdmin):
         'pk',
         'name',
         'price',
+        'brand',
         'category',
         'description',
+        'country',
         'image_preview',
         'meta_title',
         'meta_description',
         'slug',
     )
-    list_filter = ('name',)
+    list_filter = ('name', 'brand', 'country',)
     search_fields = ('name',)
     list_editable = ('price', 'description')
     ordering = ('-name',)
@@ -64,8 +94,8 @@ class ProductQuantityAdmin(admin.ModelAdmin):
     search_fields = ('product',)
 
 
-@admin.register(Categories)
-class CategoriesAdmin(admin.ModelAdmin):
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
     """
     Админка для категорий.
     """
@@ -159,8 +189,8 @@ class ShopBasketItemsAdmin(admin.ModelAdmin):
     search_fields = ('shop_basket',)
 
 
-@admin.register(Orders)
-class OrdersAdmin(admin.ModelAdmin):
+@admin.register(Order)
+class OrderAdmin(admin.ModelAdmin):
     """
     Админка для заказов.
     """
