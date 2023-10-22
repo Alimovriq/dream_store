@@ -1,4 +1,3 @@
-from tabnanny import verbose
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -14,11 +13,13 @@ class BasicMetaData(models.Model):
 
     meta_title = models.CharField(
         verbose_name='Мета-название страницы',
+        help_text='Мета-название для SEO',
         max_length=255,
         blank=True,
         null=True)
     meta_description = models.CharField(
         verbose_name='Мета-описание страницы',
+        help_text='Мета-описание для SEO',
         max_length=255,
         blank=True,
         null=True)
@@ -43,13 +44,15 @@ class Category(BasicMetaData):
         verbose_name='Описание')
     image = models.ImageField(
         verbose_name='Изображение',
+        help_text='Добавить изображение',
         null=True,
         blank=True,
         upload_to='categories/')
     slug = models.SlugField(
         unique=True,
         max_length=50,
-        verbose_name='Слаг')
+        verbose_name='Слаг',
+        help_text='URL для категории')
 
     class Meta:
         verbose_name = 'Категория'
@@ -93,7 +96,7 @@ class CountryProduct(models.Model):
     )
 
     class Meta:
-        verbose_name = 'Страна',
+        verbose_name = 'Страна'
         verbose_name_plural = 'Страны'
 
     def __str__(self) -> str:
@@ -118,6 +121,7 @@ class Product(BasicMetaData):
     brand = models.ForeignKey(
         Brand,
         on_delete=models.CASCADE,
+        help_text='Выберите бренд',
         verbose_name='Бренд')
     category = models.ForeignKey(
         Category,
@@ -142,7 +146,8 @@ class Product(BasicMetaData):
     slug = models.SlugField(
         unique=True,
         max_length=50,
-        verbose_name='Слаг')
+        verbose_name='Слаг',
+        help_text='URL для товара')
 
     class Meta:
         verbose_name = 'Товар'

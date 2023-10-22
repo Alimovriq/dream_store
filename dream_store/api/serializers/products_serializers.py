@@ -6,8 +6,8 @@ from rest_framework import serializers
 from products.models import (
     Product, ProductQuantity,
     Shop_basket, Shop_basket_items,
-    Order, OrderItems,
-    Category)
+    Order, OrderItems, Brand,
+    CountryProduct, Category)
 
 
 class Base64ImageField(serializers.ImageField):
@@ -111,12 +111,29 @@ class ProductSerializer(serializers.Serializer):
     price = serializers.DecimalField(max_digits=10,
                                      decimal_places=2,
                                      required=True)
+    in_stock = serializers.SerializerMethodField(read_only=True)
+    brand = serializers.SlugRelatedField(
+        queryset=Brand.objects.all(), slug_field='name')
+    country = serializers.SlugRelatedField(
+        queryset=CountryProduct.objects.all(), slug_field='name')
     image = Base64ImageField(required=False)
     description = serializers.CharField(required=False, allow_blank=True,
                                         max_length=500)
     category = serializers.SlugRelatedField(
         queryset=Category.objects.all(), slug_field='name')
     slug = serializers.SlugField(required=True, max_length=50)
+
+    def get_in_stock(self, obj):
+        """
+        Поле для определения товара в наличии (True/False).
+        """
+
+        product = Product.objects.filter(id=obj.id).first()
+        product_quantity = ProductQuantity.objects.filter(
+            product=product).first().stock
+        if product_quantity > 0:
+            return True
+        return False
 
     def create(self, validated_data):
         """
@@ -155,6 +172,8 @@ class ProductDetailSerializer(serializers.Serializer):
     price = serializers.DecimalField(max_digits=10,
                                      decimal_places=2,
                                      read_only=True)
+    brand = serializers.SlugRelatedField(read_only=True, slug_field='name')
+    country = serializers.SlugRelatedField(read_only=True, slug_field='name')
     image = Base64ImageField(read_only=True)
     description = serializers.CharField(read_only=True)
     category = CategorySerializer(read_only=True)
