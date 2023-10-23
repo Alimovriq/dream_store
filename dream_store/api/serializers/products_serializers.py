@@ -172,9 +172,17 @@ class ProductDetailSerializer(serializers.Serializer):
     price = serializers.DecimalField(max_digits=10,
                                      decimal_places=2,
                                      read_only=True)
+    stock = serializers.SerializerMethodField(read_only=True)
     brand = serializers.SlugRelatedField(read_only=True, slug_field='name')
     country = serializers.SlugRelatedField(read_only=True, slug_field='name')
     image = Base64ImageField(read_only=True)
     description = serializers.CharField(read_only=True)
     category = CategorySerializer(read_only=True)
     slug = serializers.SlugField(read_only=True)
+
+    def get_stock(self, obj):
+        """
+        Поле с количеством доступного товара на складе.
+        """
+
+        return ProductQuantity.objects.filter(product=obj).first().stock
