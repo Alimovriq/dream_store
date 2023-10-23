@@ -2,6 +2,7 @@
 from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
+from rest_framework.pagination import PageNumberPagination
 from rest_framework import status
 from products.models import Product, Category
 from api.serializers.products_serializers import (
@@ -15,10 +16,13 @@ def products_list(request):
     Позволяет получить список товаров и создать один экземпляр.
     """
 
+    paginator = PageNumberPagination()
+
     if request.method == 'GET':
         products = Product.objects.all()
-        serializer = ProductSerializer(products, many=True)
-        return Response(serializer.data)
+        result_page = paginator.paginate_queryset(products, request)
+        serializer = ProductSerializer(result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     elif request.method == 'POST':
         data_parsed = JSONParser().parse(request)
@@ -71,11 +75,14 @@ def categories_list(request):
     Позволяет получить список категорий и создать один экземпляр.
     """
 
+    paginator = PageNumberPagination()
+
     if request.method == 'GET':
         categories = Category.objects.all()
+        result_page = paginator.paginate_queryset(categories, request)
         serializer = CategoryDetailSerializer(
-            categories, many=True)
-        return Response(serializer.data)
+            result_page, many=True)
+        return paginator.get_paginated_response(serializer.data)
 
     elif request.method == 'POST':
         data_parsed = JSONParser().parse(request)
