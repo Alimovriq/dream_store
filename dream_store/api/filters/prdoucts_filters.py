@@ -1,8 +1,6 @@
 from django_filters import rest_framework as filters
 
-# import django_filters
-
-from products.models import Product
+from products.models import Product, Category
 
 
 class ProductFilter(filters.FilterSet):
@@ -25,3 +23,13 @@ class ProductFilter(filters.FilterSet):
                   'name',
                   'category',
                   'country')
+
+
+class CategoryFilter(filters.FilterSet):
+    """
+    Фильтрация для категорий.
+    """
+
+    class Meta:
+        model = Category
+        fields = ('name',)

@@ -6,7 +6,7 @@ from rest_framework import serializers
 from products.models import (
     Product, Shop_basket, Shop_basket_items,
     Order, OrderItems, Brand,
-    CountryProduct, Category)
+    CountryProduct, Category,)
 
 
 class Base64ImageField(serializers.ImageField):
@@ -103,4 +103,27 @@ class ProductDetailSerializer(ProductSerializer):
             'id', 'name', 'price', 'quantity',
             'brand', 'country', 'image',
             'description', 'category', 'slug',
+            'meta_title', 'meta_description',
         )
+
+
+class BrandSerializer(serializers.ModelSerializer):
+    """
+    Сериалзует данные для брендов.
+    """
+
+    class Meta:
+        model = Brand
+        fields = (
+            'id', 'name',
+            'description', 'slug')
+
+
+class CountryProductSerializer(serializers.ModelSerializer):
+    """
+    Сериалзует данные для стран.
+    """
+
+    class Meta:
+        model = CountryProduct
+        fields = ('id', 'name',)
