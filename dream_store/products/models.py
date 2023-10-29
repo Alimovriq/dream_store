@@ -118,6 +118,10 @@ class Product(BasicMetaData):
         default=1,
         help_text='Укажите стоимость товара',
         verbose_name='Стоимость')
+    quantity = models.PositiveIntegerField(
+        verbose_name='Количество товара',
+        help_text='Укажите количество товара на складе',
+        default=0)
     brand = models.ForeignKey(
         Brand,
         on_delete=models.CASCADE,
@@ -157,26 +161,26 @@ class Product(BasicMetaData):
         return self.name
 
 
-class ProductQuantity(models.Model):
-    """
-    Модель количества товаров.
-    """
+# class ProductQuantity(models.Model):
+#     """
+#     Модель количества товаров.
+#     """
 
-    product = models.ForeignKey(
-                Product,
-                on_delete=models.CASCADE,
-                help_text='Выберите товар',
-                verbose_name='Товар')
-    stock = models.PositiveIntegerField(
-        verbose_name='Доступно на складе',
-        help_text='Укажите количество товара на складе',)
+#     product = models.ForeignKey(
+#                 Product,
+#                 on_delete=models.CASCADE,
+#                 help_text='Выберите товар',
+#                 verbose_name='Товар')
+#     stock = models.PositiveIntegerField(
+#         verbose_name='Доступно на складе',
+#         help_text='Укажите количество товара на складе',)
 
-    class Meta:
-        verbose_name = 'Количество доступного товара'
-        verbose_name_plural = 'Количество доступных товаров'
+#     class Meta:
+#         verbose_name = 'Количество доступного товара'
+#         verbose_name_plural = 'Количество доступных товаров'
 
-    def __str__(self) -> str:
-        return f'{self.product} доступно для заказа {self.stock} ед.'
+#     def __str__(self) -> str:
+#         return f'{self.product} доступно для заказа {self.stock} ед.'
 
 
 class Shop_basket(models.Model):

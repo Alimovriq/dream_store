@@ -1,131 +1,79 @@
 # from django.http import HttpResponse, JsonResponse
+from django_filters import rest_framework as django_filters
 from rest_framework.decorators import api_view
 from rest_framework.parsers import JSONParser
 from rest_framework.response import Response
 from rest_framework.pagination import PageNumberPagination
-from rest_framework import status
+from rest_framework import status, generics, filters
+
 from products.models import Product, Category
 from api.serializers.products_serializers import (
     ProductSerializer, ProductDetailSerializer,
     CategorySerializer, CategoryDetailSerializer)
+from api.filters.prdoucts_filters import ProductFilter
 
 
-@api_view(['GET', 'POST'])
-def products_list(request):
+class ProductList(generics.ListCreateAPIView):
     """
-    Позволяет получить список товаров и создать один экземпляр.
-    """
-
-    paginator = PageNumberPagination()
-
-    if request.method == 'GET':
-        products = Product.objects.all()
-        result_page = paginator.paginate_queryset(products, request)
-        serializer = ProductSerializer(result_page, many=True)
-        return paginator.get_paginated_response(serializer.data)
-
-    elif request.method == 'POST':
-        data_parsed = JSONParser().parse(request)
-        serializer = ProductSerializer(data=data_parsed)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-
-@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
-def products_detail(request, slug):
-    """
-    Позволяет получить конкретную запись, перезаписать, изменить, удалить.
+    Позволяет получить список товаров, либо создать товар
+    Фильтрация полей: максимальная и мининимальная стоимость;
+    название категории; название бренда; название страны
+    Поиск по названию товара (начиная с ).
+    Сортировка по названию и цене товаров
     """
 
-    try:
-        product = Product.objects.get(slug=slug)
-    except Product.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
-
-    if request.method == 'GET':
-        serializer = ProductDetailSerializer(product)
-        return Response(serializer.data)
-
-    elif request.method == 'PUT':
-        data_parsed = JSONParser().parse(request)
-        serializer = ProductSerializer(product, data=data_parsed)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'PATCH':
-        data_parsed = JSONParser().parse(request)
-        serializer = ProductSerializer(product, data=data_parsed)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    elif request.method == 'DELETE':
-        product.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    queryset = Product.objects.all()
+    serializer_class = ProductSerializer
+    filter_backends = (
+        django_filters.DjangoFilterBackend,
+        filters.SearchFilter, filters.OrderingFilter,)
+    filterset_class = ProductFilter
+    search_fields = ('^name',)
+    ordering_fields = ('name', 'price', 'quantity')
+    ordering = ('name',)
 
 
-@api_view(['GET', 'POST'])
-def categories_list(request):
+class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
     """
-    Позволяет получить список категорий и создать один экземпляр.
+    Получить конкретный товар по {slug}, обновить запись
+    или удалить ее полностью.
     """
 
-    paginator = PageNumberPagination()
+    queryset = Product.objects.all()
+    lookup_field = 'slug'
 
-    if request.method == 'GET':
-        categories = Category.objects.all()
-        result_page = paginator.paginate_queryset(categories, request)
-        serializer = CategoryDetailSerializer(
-            result_page, many=True)
-        return paginator.get_paginated_response(serializer.data)
-
-    elif request.method == 'POST':
-        data_parsed = JSONParser().parse(request)
-        serializer = CategorySerializer(data=data_parsed)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(
-                serializer.data, status=status.HTTP_201_CREATED)
-        return Response(
-            serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return ProductDetailSerializer
+        return ProductSerializer
 
 
-@api_view(['GET', 'PUT', 'PATCH', 'DELETE'])
-def categories_detail(request, slug):
+class CategoryList(generics.ListCreateAPIView):
     """
-    Позволяет получить конкретную запись, перезаписать, изменить, удалить.
+    Позволяет получить список категорий, либо создать категорию
     """
 
-    try:
-        category = Category.objects.get(slug=slug)
-    except Category.DoesNotExist:
-        return Response(status=status.HTTP_404_NOT_FOUND)
+    queryset = Category.objects.all()
+    serializer_class = CategorySerializer
+    # filter_backends = (
+    #     django_filters.DjangoFilterBackend,
+    #     filters.SearchFilter, filters.OrderingFilter,)
+    # filterset_class = ProductFilter
+    # search_fields = ('^name',)
+    # ordering_fields = ('name', 'price', 'quantity')
+    # ordering = ('name',)
 
-    if request.method == 'GET':
-        serializer = CategorySerializer(category)
-        return Response(serializer.data)
 
-    elif request.method == 'PUT':
-        data_parsed = JSONParser().parse(request)
-        serializer = CategorySerializer(category, data=data_parsed)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
+    """
+    Получить конкретную категорию по {slug}, обновить запись
+    или удалить ее полностью.
+    """
 
-    elif request.method == 'PATCH':
-        data_parsed = JSONParser().parse(request)
-        serializer = CategorySerializer(category, data=data_parsed)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    queryset = Category.objects.all()
+    lookup_field = 'slug'
 
-    elif request.method == 'DELETE':
-        category.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
+    def get_serializer_class(self):
+        if self.request.method == 'GET':
+            return CategoryDetailSerializer
+        return CategorySerializer
