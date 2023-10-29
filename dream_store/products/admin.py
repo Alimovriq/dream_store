@@ -27,6 +27,7 @@ class BrandAdmin(admin.ModelAdmin):
         'pk',
         'name',
         'description',
+        'slug',
     )
     list_filter = ('name',)
     search_fields = ('name',)

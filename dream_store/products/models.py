@@ -75,6 +75,11 @@ class Brand(models.Model):
         max_length=500,
         help_text='Укажите описание',
         verbose_name='Описание')
+    slug = models.SlugField(
+        unique=True,
+        max_length=50,
+        verbose_name='Слаг',
+        help_text='URL для бренда')
 
     class Meta:
         verbose_name = 'Бренд'
