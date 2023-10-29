@@ -2,7 +2,7 @@ from django.contrib import admin
 from django.utils.html import format_html
 
 from .models import (
-    Product, ProductQuantity, Category,
+    Product, Category,
     Shop_basket, Shop_basket_items,
     Order, OrderItems, Brand, CountryProduct)
 
@@ -54,6 +54,7 @@ class ProductAdmin(admin.ModelAdmin):
         'pk',
         'name',
         'price',
+        'quantity',
         'brand',
         'category',
         'description',
@@ -65,7 +66,7 @@ class ProductAdmin(admin.ModelAdmin):
     )
     list_filter = ('name', 'brand', 'country',)
     search_fields = ('name',)
-    list_editable = ('price', 'description')
+    list_editable = ('price', 'description', 'quantity')
     ordering = ('-name',)
 
     @admin.display(description='Изображение')
@@ -76,22 +77,6 @@ class ProductAdmin(admin.ModelAdmin):
                     obj.image.url))
         except ValueError:
             pass
-
-
-@admin.register(ProductQuantity)
-class ProductQuantityAdmin(admin.ModelAdmin):
-    """
-    Админка для товаров и их кол-ва.
-    """
-
-    list_display = (
-        'pk',
-        'product',
-        'stock',
-    )
-    list_filter = ('product',)
-    list_editable = ('stock',)
-    search_fields = ('product',)
 
 
 @admin.register(Category)
