@@ -1,12 +1,17 @@
+from django.core.serializers import get_serializer
 from django_filters import rest_framework as django_filters
-from rest_framework import status, generics, filters
+from rest_framework import status, generics, filters, permissions
+from rest_framework.response import Response
+from rest_framework.views import APIView
 
+from users.models import User
 from products.models import (
-    Product, Category, Brand, CountryProduct,)
+    Product, Category, Brand, CountryProduct, Shop_basket, Shop_basket_items,)
 from api.serializers.products_serializers import (
     ProductSerializer, ProductDetailSerializer,
     CategorySerializer, CategoryDetailSerializer,
-    BrandSerializer, CountryProductSerializer)
+    BrandSerializer, CountryProductSerializer,
+    ShopBasketSerializer, ShopBasketItemsSerializer)
 from api.filters.prdoucts_filters import (
     ProductFilter, CategoryFilter)
 
@@ -117,3 +122,18 @@ class CountryProductDetail(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = CountryProduct.objects.all()
     serializer_class = CountryProductSerializer
+
+
+class ShopBasketAddItem(generics.CreateAPIView):
+    """
+    Представление для добавления товара в корзину
+    NO -> и его удаления, а также изменения количества.
+    """
+
+    permission_classes = [permissions.IsAuthenticated]
+    queryset = Shop_basket_items
+    serializer_class = ShopBasketItemsSerializer
+
+    def get_serializer_context(self):
+        return {'user': self.request.user,
+                'product_slug': self.kwargs['slug']}
