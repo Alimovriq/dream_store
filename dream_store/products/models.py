@@ -166,28 +166,6 @@ class Product(BasicMetaData):
         return self.name
 
 
-# class ProductQuantity(models.Model):
-#     """
-#     Модель количества товаров.
-#     """
-
-#     product = models.ForeignKey(
-#                 Product,
-#                 on_delete=models.CASCADE,
-#                 help_text='Выберите товар',
-#                 verbose_name='Товар')
-#     stock = models.PositiveIntegerField(
-#         verbose_name='Доступно на складе',
-#         help_text='Укажите количество товара на складе',)
-
-#     class Meta:
-#         verbose_name = 'Количество доступного товара'
-#         verbose_name_plural = 'Количество доступных товаров'
-
-#     def __str__(self) -> str:
-#         return f'{self.product} доступно для заказа {self.stock} ед.'
-
-
 class Shop_basket(models.Model):
     """
     Общая модель корзины для товаров.
@@ -244,8 +222,8 @@ class Shop_basket_items(models.Model):
         Проверка на количество товара на складе.
         """
 
-        queryset = ProductQuantity.objects.filter(product=self.product)
-        if self.quantity > queryset.first().stock:
+        queryset = Product.objects.filter(id=self.product.id)
+        if self.quantity > queryset.first().quantity:
             raise ValidationError(
                 f'Недостаточное количество товара {self.product.name} в наличии.')
 
@@ -323,8 +301,8 @@ class OrderItems(models.Model):
         Проверка на количество товара на складе.
         """
 
-        queryset = ProductQuantity.objects.filter(product=self.product)
-        if self.quantity > queryset.first().stock:
+        queryset = Product.objects.filter(product=self.product)
+        if self.quantity > queryset.first().quantity:
             raise ValidationError(
                 f'Недостаточное количество товара {self.product.name} в наличии.')
 
@@ -335,16 +313,16 @@ class OrderItems(models.Model):
 
         if self.order:
             queryset_order = Order.objects.filter(pk=self.order.pk)
-            queryset_product_quantity = ProductQuantity.objects.filter(
+            queryset_product_quantity = Product.objects.filter(
                 product=self.product)
             order_obj = queryset_order.first()
             order_obj.total_price += (
                 self.product.price * self.quantity)
             if queryset_product_quantity:
-                # Если найден кьюрисет в модели ProductQuantity,
+                # Если найден кьюрисет в модели Product,
                 # то убавляем кол-во
                 product_quantity_obj = queryset_product_quantity.first()
-                product_quantity_obj.stock -= self.quantity
+                product_quantity_obj.quantity -= self.quantity
                 product_quantity_obj.save()
             order_obj.save()
         return super().save(*args, **kwargs)

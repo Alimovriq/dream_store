@@ -1,8 +1,10 @@
 import base64
 
+from django.shortcuts import get_object_or_404
 from django.core.files.base import ContentFile
 from rest_framework import serializers
 
+from users.models import User
 from products.models import (
     Product, Shop_basket, Shop_basket_items,
     Order, OrderItems, Brand,
@@ -127,3 +129,56 @@ class CountryProductSerializer(serializers.ModelSerializer):
     class Meta:
         model = CountryProduct
         fields = ('id', 'name',)
+
+
+class ShopBasketSerializer(serializers.ModelSerializer):
+    """
+    ...
+    """
+
+    class Meta:
+        model = Shop_basket
+        fields = ('id', 'products', 'customer',)
+
+
+class ShopBasketItemsSerializer(serializers.ModelSerializer):
+    """
+    Сериализует данные для добавления товаров в корзину.
+    Проверяет наличие корзины для юзера и добавляет товар.
+    """
+
+    def save(self, **kwargs):
+        product = Product.objects.filter(
+            slug=self.context['product_slug']).first()
+        user = self.context['user']
+        shop_basket = Shop_basket.objects.get_or_create(customer=user)
+        shop_basket_item = Shop_basket_items.objects.get_or_create(
+            shop_basket=shop_basket[0], product=product
+        )
+        if 'quantity' in self.validated_data:
+            quantity = self.validated_data['quantity']
+            if quantity == 0:
+                quantity = 1
+            shop_basket_item[0].quantity += quantity
+        else:
+            shop_basket_item[0].quantity += 1
+        shop_basket_item[0].save()
+        self.instance = shop_basket_item[0]
+
+        return self.instance
+
+    def validate(self, value):
+        product = Product.objects.filter(
+            slug=self.context['product_slug']).first()
+        if "quantity" in value:
+            if value['quantity'] <= 0:
+                raise serializers.ValidationError(
+                    'Количество товара должно быть больше 0')
+            if value['quantity'] > product.quantity:
+                raise serializers.ValidationError(
+                    'Количество товара больше, чем в наличии на складе.')
+        return value
+
+    class Meta:
+        model = Shop_basket_items
+        fields = ('id', 'quantity',)
