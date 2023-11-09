@@ -1,4 +1,4 @@
-from django.core.serializers import get_serializer
+from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as django_filters
 from rest_framework import status, generics, filters, permissions
 from rest_framework.response import Response
@@ -7,13 +7,15 @@ from rest_framework.views import APIView
 from users.models import User
 from products.models import (
     Product, Category, Brand, CountryProduct, Shop_basket, Shop_basket_items,)
+from products.utils import get_or_create_shop_basket
 from api.serializers.products_serializers import (
     ProductSerializer, ProductDetailSerializer,
     CategorySerializer, CategoryDetailSerializer,
     BrandSerializer, CountryProductSerializer,
-    ShopBasketSerializer, ShopBasketItemsSerializer)
+    ShopBasketSerializer, ShopBasketItemSerializer)
 from api.filters.prdoucts_filters import (
     ProductFilter, CategoryFilter)
+from api.views.mixins import ListCreateUpdateDestroyMixin
 
 
 class ProductList(generics.ListCreateAPIView):
@@ -124,7 +126,7 @@ class CountryProductDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = CountryProductSerializer
 
 
-class ShopBasketAddItem(generics.CreateAPIView):
+class ShopBasketItem(ListCreateUpdateDestroyMixin):
     """
     Представление для добавления товара в корзину
     NO -> и его удаления, а также изменения количества.
@@ -132,8 +134,35 @@ class ShopBasketAddItem(generics.CreateAPIView):
 
     permission_classes = [permissions.IsAuthenticated]
     queryset = Shop_basket_items
-    serializer_class = ShopBasketItemsSerializer
+    serializer_class = ShopBasketItemSerializer
 
     def get_serializer_context(self):
-        return {'user': self.request.user,
-                'product_slug': self.kwargs['slug']}
+        return {'user': self.request.user}
+
+    def post(self, request, *args, **kwargs):
+        updated_request = get_or_create_shop_basket(request)
+        return self.create(updated_request, *args, **kwargs)
+
+# class ShopBasketItem(CreateUpdateDestroyMixin):
+#     """
+#     Представление для добавления товара в корзину
+#     NO -> и его удаления, а также изменения количества.
+#     """
+
+#     permission_classes = [permissions.IsAuthenticated]
+#     queryset = Shop_basket_items
+#     serializer_class = ShopBasketItemSerializer
+
+#     def get_serializer_context(self):
+#         return {'user': self.request.user,
+#                 'product_slug': self.kwargs['slug']}
+
+#     def get_object(self):
+#         queryset = Shop_basket_items.objects.filter()
+#         return super().get_object()
+
+#     def post(self, request, *args, **kwargs):
+#         return self.create(request, *args, **kwargs)
+
+#     def put(self, request, *args, **kwargs):
+#         return self.update(request, *args, **kwargs)

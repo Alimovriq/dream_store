@@ -213,6 +213,12 @@ class Shop_basket_items(models.Model):
     class Meta:
         verbose_name = 'Товар для корзины'
         verbose_name_plural = 'Товары для корзин'
+        constraints = [
+            models.UniqueConstraint(
+                fields=['product', 'shop_basket'],
+                name='unique_product_shop_basket'
+            )
+        ]
 
     def __str__(self) -> str:
         return f'Объект корзины с {self.product} в кол-ве {self.quantity} ед.'
