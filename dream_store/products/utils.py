@@ -6,15 +6,35 @@ from .models import Shop_basket, Shop_basket_items
 USER = get_user_model()
 
 
-def get_or_create_shop_basket(request: dict) -> dict:
+# def get_or_create_shop_basket(request: dict) -> dict:
+#     """
+#     Создает или находит существующую корзину.
+#     Берет данные из request.
+#     """
+
+#     customer = request.user
+#     shop_basket = Shop_basket.objects.get_or_create(
+#         customer=customer)
+#     # request.data.update({'shop_basket': shop_basket[0].pk})
+
+#     return shop_basket[0]
+
+def create_shop_basket(customer):
     """
-    Создает или находит существующую корзину.
-    Берет данные из request.
+    Создает корзину для пользователя.
+    """
+
+    created_basket = Shop_basket.objects.create(customer=customer)
+    return created_basket
+
+
+def get_shop_basket(request):
+    """
+    Позволяет получить корзину для пользователя.
     """
 
     customer = request.user
-    shop_basket = Shop_basket.objects.get_or_create(
-        customer=customer)
-    request.data.update({'shop_basket': shop_basket[0].pk})
 
-    return request
+    if basket := Shop_basket.objects.filter(customer=customer):
+        return basket[0]
+    return create_shop_basket(customer)
