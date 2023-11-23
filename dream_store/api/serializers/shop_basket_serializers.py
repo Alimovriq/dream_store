@@ -40,6 +40,25 @@ class ProductShopBasketListSerializer(serializers.ModelSerializer):
         return obj.product.price * self.get_quantity(obj)
 
 
+class ProductShopBasketUpdateSerializer(serializers.ModelSerializer):
+    """
+    Данные товара для обновления корзины пользователя.
+    """
+
+    # name = serializers.SerializerMethodField()
+    # quantity = serializers.SerializerMethodField()
+
+    class Meta:
+        model = Shop_basket_items
+        fields = ('product', 'quantity',)
+
+    # def get_name(self, obj):
+    #     return obj.product.name
+
+    # def get_quantity(self, obj):
+    #     return obj.quantity
+
+
 class ShopBasketSerializer(serializers.ModelSerializer):
     """
     Сериализатор для получения корзины с товарами пользователя.
@@ -86,6 +105,9 @@ class ShopBasketItemCreateSerializer(serializers.ModelSerializer):
     Сериализатор для создания корзины с товарами.
     """
 
+    product = serializers.SlugRelatedField(
+        slug_field='name', queryset=Product.objects.all())
+
     class Meta:
         model = Shop_basket_items
         fields = ('shop_basket',
@@ -97,63 +119,35 @@ class ShopBasketItemCreateSerializer(serializers.ModelSerializer):
             )
         ]
 
-# # Ниже написан неверный сериализатор
-# class ShopBasketItemSerializer(serializers.ModelSerializer):
 
-#     class Meta:
-#         model = Shop_basket_items
-#         fields = ('id', 'shop_basket', 'product', 'quantity',)
-#         validators = [
-#             UniqueTogetherValidator(
-#                 queryset=Shop_basket_items.objects.all(),
-#                 fields=['product', 'shop_basket']
-#             )
-#         ]
+class ShopBasketUpdateSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для обновления корзины с товарами пользователя.
+    """
 
-#     def validate(self, value):
-#         if 'quantity' in value:
-#             product = Product.objects.filter(pk=value['product'].pk)
-#             if value['quantity'] <= 0:
-#                 raise serializers.ValidationError(
-#                     'Количество товара для заказа должно быть больше 0.'
-#                 )
-#             elif value['quantity'] > product.first().quantity:
-#                 raise serializers.ValidationError(
-#                     'Количество товара больше, чем доступно для заказа.'
-#                 )
-#         return value
+    products = ProductShopBasketUpdateSerializer(
+        many=True, source='shop_basket_items_set')
 
-    # def create(self, validated_data):
-    #     print(f' VALIDATED_DATA {validated_data}')
-    #     # product = self.validated_data.pop('product')
-    #     user = self.context['user']
-    #     shop_basket = Shop_basket.objects.get_or_create(customer=user)
-    #     shop_basket_item = Shop_basket_items.objects.create(
-    #         shop_basket=shop_basket[0], **validated_data
-    #     )
+    class Meta:
+        model = Shop_basket
+        fields = ('id', 'products',)
 
-    #     return shop_basket_item
+    def update(self, instance, validated_data):
+        for key in validated_data['shop_basket_items_set']:
+            if shop_basket_item := Shop_basket_items.objects.filter(
+                    shop_basket=instance, product=key['product']):
+                if key['quantity'] > 0:
+                    shop_basket_item[0].quantity = key['quantity']
+                    shop_basket_item[0].save()
+                elif key['quantity'] == 0:
+                    shop_basket_item.delete()
+                elif key['quantity'] < 0:
+                    raise serializers.ValidationError({
+                        'quantity': 'Данное поле должно быть больше >= 0.'
+                    })
+            else:
+                raise serializers.ValidationError({
+                    'product': 'Товар не найден'
+                    })
 
-    # def save(self, **kwargs):
-    #     print('BEGIN!!!')
-    #     print(f'PRODUCT {self.validated_data["product"]}')
-    #     # product = Product.objects.filter(
-    #     #     slug=self.validated_data['product']).first()
-    #     product = Product.objects.get(self.validated_data['product'])
-    #     print(f'PRODUCT {product}')
-    #     user = self.context['user']
-    #     shop_basket = Shop_basket.objects.get_or_create(customer=user)
-    #     shop_basket_item = Shop_basket_items.objects.get_or_create(
-    #         shop_basket=shop_basket[0], product=product
-    #     )
-    #     if 'quantity' in self.validated_data:
-    #         quantity = self.validated_data['quantity']
-    #         if quantity == 0:
-    #             quantity = 1
-    #         shop_basket_item[0].quantity += quantity
-    #     else:
-    #         shop_basket_item[0].quantity += 1
-    #     shop_basket_item[0].save()
-    #     self.instance = shop_basket_item[0]
-
-    #     return self.instance
+        return instance
