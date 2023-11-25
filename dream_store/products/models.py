@@ -116,7 +116,8 @@ class Product(BasicMetaData):
     name = models.CharField(
         max_length=255,
         help_text='Введите название товара',
-        verbose_name='Наименование')
+        verbose_name='Наименование',
+        unique=True)
     price = models.DecimalField(
         max_digits=10,
         decimal_places=2,

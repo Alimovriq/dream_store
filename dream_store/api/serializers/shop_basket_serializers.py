@@ -45,18 +45,12 @@ class ProductShopBasketUpdateSerializer(serializers.ModelSerializer):
     Данные товара для обновления корзины пользователя.
     """
 
-    # name = serializers.SerializerMethodField()
-    # quantity = serializers.SerializerMethodField()
+    product = serializers.SlugRelatedField(
+        slug_field='name', queryset=Product.objects.all())
 
     class Meta:
         model = Shop_basket_items
         fields = ('product', 'quantity',)
-
-    # def get_name(self, obj):
-    #     return obj.product.name
-
-    # def get_quantity(self, obj):
-    #     return obj.quantity
 
 
 class ShopBasketSerializer(serializers.ModelSerializer):
@@ -130,7 +124,7 @@ class ShopBasketUpdateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Shop_basket
-        fields = ('id', 'products',)
+        fields = ('products',)
 
     def update(self, instance, validated_data):
         for key in validated_data['shop_basket_items_set']:
@@ -145,9 +139,9 @@ class ShopBasketUpdateSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError({
                         'quantity': 'Данное поле должно быть больше >= 0.'
                     })
-            else:
-                raise serializers.ValidationError({
-                    'product': 'Товар не найден'
-                    })
+            # else:
+            #     raise serializers.ValidationError({
+            #         f"product: Товар {key['product']} не найден'"
+            #         })
 
         return instance
