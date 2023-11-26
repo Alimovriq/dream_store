@@ -139,12 +139,17 @@ class ShopBasketItemIncreaseSerializer(serializers.ModelSerializer):
     def validate(self, value):
         shop_basket = value['shop_basket']
         product = value['product']
-
-        if not Shop_basket_items.objects.filter(
+        product_qs = Product.objects.filter(id=product.pk).first()
+        shop_basket_item = Shop_basket_items.objects.filter(
             shop_basket=shop_basket, product=product
-        ):
+        ).first()
+        if not shop_basket_item:
             raise serializers.ValidationError(
                 f'Товар {value["product"]} отсутствует в корзине'
+            )
+        elif shop_basket_item.quantity == product_qs.quantity:
+            raise serializers.ValidationError(
+                f'Недостаточное количество {value["product"]} в наличии.'
             )
         return value
 
@@ -165,6 +170,18 @@ class ShopBasketItemDecreaseSerializer(ShopBasketItemIncreaseSerializer):
         else:
             item.save()
         return item
+
+    def validate(self, value):
+        shop_basket = value['shop_basket']
+        product = value['product']
+        shop_basket_item = Shop_basket_items.objects.filter(
+            shop_basket=shop_basket, product=product
+        )
+        if not shop_basket_item:
+            raise serializers.ValidationError(
+                f'Товар {value["product"]} отсутствует в корзине'
+            )
+        return value
 
 
 class ShopBasketUpdateSerializer(serializers.ModelSerializer):
