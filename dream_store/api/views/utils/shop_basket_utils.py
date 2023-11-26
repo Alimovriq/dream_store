@@ -46,7 +46,7 @@ def list_shop_basket(request: Any) -> Response:
 
 def destroy_shop_basket(request: Any) -> Response:
     """
-    Удаляет корзину, не оставля в ней товаров пользователя.
+    Удаляет корзину, не оставляя в ней товаров пользователя.
     """
 
     instance = get_shop_basket(request)
