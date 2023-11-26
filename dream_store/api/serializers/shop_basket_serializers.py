@@ -96,7 +96,7 @@ class ShopBasketSerializer(serializers.ModelSerializer):
 
 class ShopBasketItemCreateSerializer(serializers.ModelSerializer):
     """
-    Сериализатор для создания корзины с товарами.
+    Сериализатор для создания объектов корзины.
     """
 
     product = serializers.SlugRelatedField(
@@ -112,6 +112,59 @@ class ShopBasketItemCreateSerializer(serializers.ModelSerializer):
                 fields=['product', 'shop_basket']
             )
         ]
+
+
+class ShopBasketItemIncreaseSerializer(serializers.ModelSerializer):
+    """
+    Сериализатор для увеличения количества объекта корзины.
+    """
+
+    product = serializers.SlugRelatedField(
+        slug_field='name', queryset=Product.objects.all())
+
+    class Meta:
+        model = Shop_basket_items
+        fields = ('shop_basket',
+                  'product',)
+
+    def create(self, validated_data):
+        shop_basket = validated_data['shop_basket']
+        product = validated_data['product']
+        item = Shop_basket_items.objects.filter(
+            shop_basket=shop_basket, product=product).first()
+        item.quantity += 1
+        item.save()
+        return item
+
+    def validate(self, value):
+        shop_basket = value['shop_basket']
+        product = value['product']
+
+        if not Shop_basket_items.objects.filter(
+            shop_basket=shop_basket, product=product
+        ):
+            raise serializers.ValidationError(
+                f'Товар {value["product"]} отсутствует в корзине'
+            )
+        return value
+
+
+class ShopBasketItemDecreaseSerializer(ShopBasketItemIncreaseSerializer):
+    """
+    Сериализатор для уменьшения количества объекта корзины.
+    """
+
+    def create(self, validated_data):
+        shop_basket = validated_data['shop_basket']
+        product = validated_data['product']
+        item = Shop_basket_items.objects.filter(
+            shop_basket=shop_basket, product=product).first()
+        item.quantity -= 1
+        if item.quantity == 0:
+            item.delete()
+        else:
+            item.save()
+        return item
 
 
 class ShopBasketUpdateSerializer(serializers.ModelSerializer):
@@ -139,9 +192,4 @@ class ShopBasketUpdateSerializer(serializers.ModelSerializer):
                     raise serializers.ValidationError({
                         'quantity': 'Данное поле должно быть больше >= 0.'
                     })
-            # else:
-            #     raise serializers.ValidationError({
-            #         f"product: Товар {key['product']} не найден'"
-            #         })
-
         return instance
