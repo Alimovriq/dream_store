@@ -251,7 +251,7 @@ class Order(models.Model):
         help_text='Выберите товар',
         verbose_name='Товары')
     total_price = models.DecimalField(
-        max_digits=6,
+        max_digits=10,
         decimal_places=2,
         default=0,
         help_text='Укажите итоговую стоимость',
@@ -314,28 +314,7 @@ class OrderItems(models.Model):
         Проверка на количество товара на складе.
         """
 
-        queryset = Product.objects.filter(product=self.product)
+        queryset = Product.objects.filter(pk=self.product.pk)
         if self.quantity > queryset.first().quantity:
             raise ValidationError(
                 f'Недостаточное количество товара {self.product.name} в наличии.')
-
-    def save(self, *args, **kwargs):
-        """
-        Обновление итоговой стоимости заказа и вычитание кол-ва со склада.
-        """
-
-        if self.order:
-            queryset_order = Order.objects.filter(pk=self.order.pk)
-            queryset_product_quantity = Product.objects.filter(
-                product=self.product)
-            order_obj = queryset_order.first()
-            order_obj.total_price += (
-                self.product.price * self.quantity)
-            if queryset_product_quantity:
-                # Если найден кьюрисет в модели Product,
-                # то убавляем кол-во
-                product_quantity_obj = queryset_product_quantity.first()
-                product_quantity_obj.quantity -= self.quantity
-                product_quantity_obj.save()
-            order_obj.save()
-        return super().save(*args, **kwargs)
