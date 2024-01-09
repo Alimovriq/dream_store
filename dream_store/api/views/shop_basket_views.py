@@ -34,6 +34,7 @@ class ShopBasketItemIncrease(APIView):
     """
     Представление для увеличения количества товара.
     """
+
     permission_classes = [permissions.IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
