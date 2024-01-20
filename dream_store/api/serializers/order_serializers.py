@@ -58,14 +58,6 @@ class OrderItemCreateSerializer(serializers.ModelSerializer):
                 fields=['product', 'order']
             )
         ]
-# class OrderItemsSerializer(serializers.ModelSerializer):
-#     """
-#     Сериализует данные для объектов в заказах.
-#     """
-
-#     class Meta:
-#         model = OrderItems
-#         fields = ('order', 'product', 'quantity',)
 
 
 class OrderListSerializer(serializers.ModelSerializer):
@@ -94,8 +86,6 @@ class OrderCreateSerializer(serializers.ModelSerializer):
     customer = serializers.SlugRelatedField(
         slug_field='email', queryset=USER.objects.all())
     products = OrderItemCreateSerializer(many=True, required=True)
-    # products = ProductOrderSerializer(
-    #     many=True, source='orderitems_set', required=False)
 
     class Meta:
         model = Order
@@ -106,20 +96,23 @@ class OrderCreateSerializer(serializers.ModelSerializer):
             'id', 'total_price', 'created_at', 'is_payed',)
 
     def create(self, validated_data):
-        # Передать данные пользователя
-        # Найти корзину, определить связанные объекты
-        # Создать Заказ
-        # Связанные объекты перенести в OrderItems
-        # Обнулить связанные объекты для корзины пользователя
-        # Сохранить изменения.
         customer = validated_data.get('customer')
-        if shop_basket := Shop_basket.objects.filter(customer=customer):
-            if len(shop_basket.first().products.all()) > 0:
-                print(
-                    f'shop_basket products {shop_basket.first().products.all()}')
-        else:
-            raise serializers.ValidationError(
-                'У пользователя пустая коризна')
-        order_obj = Order.objects.create(customer=customer)
-        return order_obj
+        products = validated_data.get('products')
+        address = validated_data.get('address')
 
+        for item in products:
+            OrderItems.objects.create(
+                order=item['order'],
+                product=item['product'],
+                quantity=item['quantity']
+            )
+
+        order_obj = Order.objects.all()[::-1][0]
+        order_obj.address = address
+        order_obj.save()
+
+        shop_basket_obj = Shop_basket.objects.filter(customer=customer)
+        shop_basket_obj.delete()
+
+        # Поменять ответ
+        return validated_data
