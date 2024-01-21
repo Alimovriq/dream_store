@@ -3,7 +3,7 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from products.models import (
-    Product, Shop_basket, Shop_basket_items, Order, OrderItems,)
+    Product, Shop_basket, Order, OrderItems,)
 
 USER = get_user_model()
 
