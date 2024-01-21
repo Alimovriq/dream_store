@@ -1,15 +1,13 @@
-from rest_framework.response import Response
-from rest_framework import permissions, status
-from rest_framework.views import APIView
-from rest_framework.generics import GenericAPIView, ListCreateAPIView
+from rest_framework import permissions
+from rest_framework.generics import GenericAPIView
 
 from api.views.utils.order_utils import process_order
-from products.models import Order, OrderItems, Shop_basket, Shop_basket_items
+from products.models import Order
 from api.serializers.order_serializers import (
     OrderListSerializer, OrderCreateSerializer,)
 
 
-class OrderView(ListCreateAPIView):
+class OrderView(GenericAPIView):
     """
     Представление для получения списка
     и создания заказов пользователя.
