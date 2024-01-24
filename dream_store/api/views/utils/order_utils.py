@@ -46,11 +46,9 @@ def create_order(customer: Any) -> Any:
     return order_obj
 
 
-def process_order(request: Any, get_serializer: Any) -> Response:
+def post_operations_in_orders(request: Any, serializer: Any) -> Response:
     """
-    Проверяет наличие корзины у пользователя
-    и создает, либо не создает заказ для пользователя
-    с учетом удаления старой корзины.
+    Операции с заказами при POST запросах.
     """
 
     # Проверяю наличие корзины пользователя
@@ -66,7 +64,7 @@ def process_order(request: Any, get_serializer: Any) -> Response:
             data = create_order_items(order_obj, shop_basket_obj)
             data.update({'customer': customer})
             request.data.update(data)
-            serializer = get_serializer(data=request.data)
+            serializer = serializer(data=request.data)
             if serializer.is_valid():
                 serializer.save()
                 return Response(
@@ -80,3 +78,26 @@ def process_order(request: Any, get_serializer: Any) -> Response:
     return Response(
         {'errors': 'Корзина пользователя пустая'},
         status=status.HTTP_400_BAD_REQUEST)
+
+
+def get_operations_in_orders(
+        request: Any, serializer: Any, queryset: Any) -> Response:
+    """
+    Операции с заказами при GET запросах.
+    """
+
+    serializer = serializer(queryset, many=True)
+    return Response(serializer.data, status=status.HTTP_200_OK)
+
+
+def process_order(request: Any, serializer: Any, queryset=None) -> Response:
+    """
+    Проверяет наличие корзины у пользователя
+    и создает, либо не создает заказ для пользователя
+    с учетом удаления старой корзины.
+    """
+
+    if request.method == 'POST':
+        return post_operations_in_orders(request, serializer)
+    else:
+        return get_operations_in_orders(request, serializer, queryset)
