@@ -86,7 +86,8 @@ def get_operations_in_orders(
     Операции с заказами при GET запросах.
     """
 
-    serializer = serializer(queryset, many=True)
+    context = {'host': request.get_host()}
+    serializer = serializer(queryset, many=True, context=context)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
@@ -99,5 +100,4 @@ def process_order(request: Any, serializer: Any, queryset=None) -> Response:
 
     if request.method == 'POST':
         return post_operations_in_orders(request, serializer)
-    else:
-        return get_operations_in_orders(request, serializer, queryset)
+    return get_operations_in_orders(request, serializer, queryset)
