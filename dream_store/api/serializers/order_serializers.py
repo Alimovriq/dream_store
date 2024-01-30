@@ -27,10 +27,10 @@ class ProductOrderSerializer(serializers.ModelSerializer):
         return obj.product.name
 
     def get_image(self, obj):
-        # request = self.context.get('host')
-        # if obj.product.image:
-        #     full_url = request + obj.product.image.url
-        #     return full_url
+        request = self.context.get('host')
+        if obj.product.image:
+            full_url = request + obj.product.image.url
+            return full_url
         return 'null'
 
     def get_slug(self, obj):
