@@ -1,8 +1,7 @@
 from django.contrib import admin
 from django.utils.html import format_html
 
-from news.models import News
-
+from news.models import News, Comments
 
 @admin.register(News)
 class NewsAdmin(admin.ModelAdmin):
@@ -31,3 +30,21 @@ class NewsAdmin(admin.ModelAdmin):
                     obj.image.url))
         except ValueError:
             pass
+
+
+@admin.register(Comments)
+class CommentsAdmin(admin.ModelAdmin):
+    """
+    Админка для комментариев пользователей.
+    """
+
+    list_display = (
+        'pk',
+        'author',
+        'news',
+        'comment',
+        'pub_date',)
+    list_filter = (
+        'author',
+        'news',
+        'pub_date',)
