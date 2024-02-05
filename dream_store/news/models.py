@@ -1,4 +1,8 @@
 from django.db import models
+from django.contrib.auth import get_user_model
+
+
+USER = get_user_model()
 
 
 class News(models.Model):
@@ -41,3 +45,33 @@ class News(models.Model):
 
     def __str__(self) -> str:
         return self.title[:30]
+
+
+class Comments(models.Model):
+    """
+    Модель комментариев пользователей.
+    """
+
+    author = models.ForeignKey(
+        USER,
+        on_delete=models.CASCADE,
+        verbose_name='Автор')
+    news = models.ForeignKey(
+        News,
+        on_delete=models.CASCADE,
+        verbose_name='Новость')
+    comment = models.TextField(
+        max_length=500,
+        verbose_name='Комментарий')
+    pub_date = models.DateTimeField(
+        auto_now_add=True,
+        db_index=True,
+        verbose_name='Дата создания')
+
+    class Meta:
+        ordering = ['-pub_date']
+        verbose_name = 'Комментарий',
+        verbose_name_plural = 'Комментарии'
+
+    def __str__(self) -> str:
+        return f'Пользователь {self.author} оставил комментарий №{self.pk}'
