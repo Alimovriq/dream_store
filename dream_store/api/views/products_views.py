@@ -1,10 +1,8 @@
-from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as django_filters
-from rest_framework import status, generics, filters, permissions
-from rest_framework.response import Response
-from rest_framework.views import APIView
+from rest_framework import generics, filters
+from rest_framework.permissions import (
+    SAFE_METHODS, IsAdminUser, AllowAny,) 
 
-from users.models import User
 from products.models import (
     Product, Category, Brand, CountryProduct)
 from api.serializers.products_serializers import (
@@ -34,6 +32,11 @@ class ProductList(generics.ListCreateAPIView):
     ordering_fields = ('name', 'price', 'quantity')
     ordering = ('name',)
 
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAdminUser()]
+
 
 class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -45,9 +48,14 @@ class ProductDetail(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'slug'
 
     def get_serializer_class(self):
-        if self.request.method == 'GET':
+        if self.request.method in SAFE_METHODS:
             return ProductDetailSerializer
         return ProductSerializer
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAdminUser()]
 
 
 class CategoryList(generics.ListCreateAPIView):
@@ -68,6 +76,11 @@ class CategoryList(generics.ListCreateAPIView):
     ordering_fields = ('name',)
     ordering = ('name',)
 
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAdminUser()]
+
 
 class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
     """
@@ -79,9 +92,14 @@ class CategoryDetail(generics.RetrieveUpdateDestroyAPIView):
     lookup_field = 'slug'
 
     def get_serializer_class(self):
-        if self.request.method == 'GET':
+        if self.request.method in SAFE_METHODS:
             return CategoryDetailSerializer
         return CategorySerializer
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAdminUser()]
 
 
 class BrandList(generics.ListCreateAPIView):
@@ -91,6 +109,11 @@ class BrandList(generics.ListCreateAPIView):
 
     queryset = Brand.objects.all()
     serializer_class = BrandSerializer
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAdminUser()]
 
 
 class BrandDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -103,6 +126,11 @@ class BrandDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = BrandSerializer
     lookup_field = 'slug'
 
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAdminUser()]
+
 
 class CountryProductList(generics.ListCreateAPIView):
     """
@@ -111,6 +139,11 @@ class CountryProductList(generics.ListCreateAPIView):
 
     queryset = CountryProduct.objects.all()
     serializer_class = CountryProductSerializer
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAdminUser()]
 
 
 class CountryProductDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -121,3 +154,8 @@ class CountryProductDetail(generics.RetrieveUpdateDestroyAPIView):
 
     queryset = CountryProduct.objects.all()
     serializer_class = CountryProductSerializer
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny()]
+        return [IsAdminUser()]
