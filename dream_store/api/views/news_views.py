@@ -25,7 +25,7 @@ class NewsList(ListCreateAPIView):
         filters.SearchFilter, filters.OrderingFilter,)
     filterset_class = NewsFilter
     search_fields = ('^title',)
-    ordering_fields = ('title', 'pub_date')
+    ordering_fields = ('title', 'pub_date',)
 
     def get_permissions(self):
         if self.request.method in SAFE_METHODS:
