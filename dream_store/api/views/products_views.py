@@ -9,7 +9,7 @@ from api.serializers.products_serializers import (
     ProductSerializer, ProductDetailSerializer,
     CategorySerializer, CategoryDetailSerializer,
     BrandSerializer, CountryProductSerializer)
-from api.filters.prdoucts_filters import (
+from api.filters.products_filters import (
     ProductFilter, CategoryFilter)
 
 
