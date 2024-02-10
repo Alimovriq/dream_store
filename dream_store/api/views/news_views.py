@@ -1,13 +1,14 @@
+from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as django_filters
 from rest_framework import filters
 from rest_framework.generics import (
     ListCreateAPIView, RetrieveUpdateDestroyAPIView,)
 from rest_framework.permissions import (
-    AllowAny, IsAdminUser, SAFE_METHODS)
+    AllowAny, IsAdminUser, IsAuthenticated, SAFE_METHODS,)
 
 from api.serializers.news_serializers import (
     NewsSerializer, CommentsSerializer,)
-from api.filters.news_filters import NewsFilter
+from api.filters.news_filters import NewsFilter, CommentFilter
 from news.models import News, Comments
 
 
@@ -51,3 +52,43 @@ class NewsRetrieve(RetrieveUpdateDestroyAPIView):
         if self.request.method in SAFE_METHODS:
             return [AllowAny()]
         return [IsAdminUser()]
+
+
+class CommentList(ListCreateAPIView):
+    """
+    Создавать запись и получать список
+    записей может любой авторизованный
+    пользователь.
+    """
+
+    serializer_class = CommentsSerializer
+    filter_backends = (
+        django_filters.DjangoFilterBackend,
+        filters.SearchFilter, filters.OrderingFilter,
+    )
+    filterset_class = CommentFilter
+    search_fields = ('text',)
+    ordering_fields = (
+        'author',
+        'pub_date',
+        )
+
+    def get_queryset(self):
+        news = get_object_or_404(
+            News,
+            slug=self.kwargs.get('slug'))
+        return news.comments.filter(is_published=True)
+
+    def get_permissions(self):
+        if self.request.method in SAFE_METHODS:
+            return [AllowAny(),]
+        return [IsAuthenticated()]
+
+    def perform_create(self, serializer):
+        news = get_object_or_404(
+            News,
+            slug=self.kwargs.get('slug')
+        )
+        serializer.save(
+            author=self.request.user,
+            news=news)

@@ -55,18 +55,24 @@ class Comments(models.Model):
     author = models.ForeignKey(
         USER,
         on_delete=models.CASCADE,
-        verbose_name='Автор')
+        verbose_name='Автор',
+        related_name='comments')
     news = models.ForeignKey(
         News,
         on_delete=models.CASCADE,
-        verbose_name='Новость')
-    comment = models.TextField(
+        verbose_name='Новость',
+        related_name='comments')
+    text = models.TextField(
         max_length=500,
         verbose_name='Комментарий')
     pub_date = models.DateTimeField(
         auto_now_add=True,
         db_index=True,
         verbose_name='Дата создания')
+    is_published = models.BooleanField(
+        default=False,
+        verbose_name='Опубликован'
+    )
 
     class Meta:
         ordering = ['-pub_date']
