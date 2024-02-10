@@ -42,9 +42,11 @@ class CommentsAdmin(admin.ModelAdmin):
         'pk',
         'author',
         'news',
-        'comment',
-        'pub_date',)
+        'text',
+        'pub_date',
+        'is_published',)
     list_filter = (
         'author',
         'news',
-        'pub_date',)
+        'pub_date',
+        'is_published',)

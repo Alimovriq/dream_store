@@ -27,12 +27,15 @@ class CommentsSerializer(serializers.ModelSerializer):
     Сериализатор для комментариев.
     """
 
+    author = serializers.SlugRelatedField(
+        read_only=True, slug_field='email'
+    )
+
     class Meta:
         model = Comments
         fields = (
             'pk',
             'author',
-            'news',
-            'comment',
+            'text',
             'pub_date',
         )
