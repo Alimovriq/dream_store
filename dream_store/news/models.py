@@ -1,3 +1,4 @@
+from email.policy import default
 from django.db import models
 from django.contrib.auth import get_user_model
 
@@ -20,6 +21,10 @@ class News(models.Model):
         null=True,
         blank=True,
         upload_to='news/')
+    views = models.PositiveIntegerField(
+        default=0,
+        verbose_name='Количество просмотров',
+    )
     pub_date = models.DateField(
         auto_now_add=True,
         verbose_name='Дата публикации')
