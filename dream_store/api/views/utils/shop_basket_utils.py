@@ -1,5 +1,6 @@
 from typing import Any
 from rest_framework import status
+from rest_framework.permissions import SAFE_METHODS
 from rest_framework.response import Response
 from api.serializers.shop_basket_serializers import (
     ShopBasketItemCreateSerializer, ShopBasketUpdateSerializer,
@@ -69,9 +70,6 @@ def update_shop_basket(request: Any) -> Response:
     return Response(
         serializer.data,
         status=status.HTTP_201_CREATED)
-    # return Response(
-    #     {'response': f'Корзина для пользователя {request.user} обновлена.'},
-    #     status=status.HTTP_201_CREATED)
 
 
 def create_shopbasket_item(request: Any) -> Response:
@@ -106,7 +104,7 @@ def process_shop_basket(request: Any) -> Response:
     или частичное удаление.
     """
 
-    if request.method == 'GET':
+    if request.method in SAFE_METHODS:
         return list_shop_basket(request)
     elif request.method == 'POST':
         return create_shopbasket_item(request)

@@ -1,6 +1,6 @@
 from rest_framework import permissions
-from rest_framework.generics import ListCreateAPIView, GenericAPIView
-from rest_framework.response import Response
+from rest_framework.permissions import SAFE_METHODS
+from rest_framework.generics import GenericAPIView
 
 from api.views.utils.order_utils import process_order
 from products.models import Order
@@ -17,13 +17,13 @@ class OrderView(GenericAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        if self.request.method == 'GET':
+        if self.request.method in SAFE_METHODS:
             return Order.objects.filter(
                 customer=self.request.user).order_by(
                     '-created_at')
 
     def get_serializer_class(self):
-        if self.request.method == 'GET':
+        if self.request.method in SAFE_METHODS:
             return OrderListSerializer
         elif self.request.method == 'POST':
             return OrderCreateSerializer

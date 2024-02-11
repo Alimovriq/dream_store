@@ -1,7 +1,7 @@
 from django_filters import rest_framework as django_filters
 from rest_framework import generics, filters
 from rest_framework.permissions import (
-    SAFE_METHODS, IsAdminUser, AllowAny,) 
+    SAFE_METHODS, IsAdminUser, AllowAny,)
 
 from products.models import (
     Product, Category, Brand, CountryProduct)
