@@ -10,7 +10,7 @@ from rest_framework.permissions import (
 from api.serializers.news_serializers import (
     NewsSerializer, CommentsSerializer,)
 from api.filters.news_filters import NewsFilter, CommentFilter
-from news.models import News, Comments
+from news.models import News
 
 
 class NewsList(ListCreateAPIView):
