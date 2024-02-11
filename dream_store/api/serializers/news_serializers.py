@@ -16,6 +16,7 @@ class NewsSerializer(serializers.ModelSerializer):
             'text',
             'image',
             'pub_date',
+            'views',
             'slug',
             'meta_title',
             'meta_description',

@@ -1,6 +1,7 @@
 from django.shortcuts import get_object_or_404
 from django_filters import rest_framework as django_filters
 from rest_framework import filters
+from rest_framework.response import Response
 from rest_framework.generics import (
     ListCreateAPIView, RetrieveUpdateDestroyAPIView,)
 from rest_framework.permissions import (
@@ -9,7 +10,7 @@ from rest_framework.permissions import (
 from api.serializers.news_serializers import (
     NewsSerializer, CommentsSerializer,)
 from api.filters.news_filters import NewsFilter, CommentFilter
-from news.models import News, Comments
+from news.models import News
 
 
 class NewsList(ListCreateAPIView):
@@ -52,6 +53,13 @@ class NewsRetrieve(RetrieveUpdateDestroyAPIView):
         if self.request.method in SAFE_METHODS:
             return [AllowAny()]
         return [IsAdminUser()]
+
+    def retrieve(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.views += 1
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
 
 
 class CommentList(ListCreateAPIView):

@@ -3,6 +3,7 @@ from django.utils.html import format_html
 
 from news.models import News, Comments
 
+
 @admin.register(News)
 class NewsAdmin(admin.ModelAdmin):
     """
@@ -15,6 +16,7 @@ class NewsAdmin(admin.ModelAdmin):
         'title',
         'text',
         'image_preview',
+        'views',
         'slug',
         'meta_title',
         'meta_description',)
