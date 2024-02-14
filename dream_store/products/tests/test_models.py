@@ -164,3 +164,78 @@ class CountryProductModelTest(TestCase):
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
+
+
+@override_settings(MEDIA_ROOT=MEDIA_ROOT)
+class ProductModelTest(TestCase):
+    """
+    Тестирование модели товаров.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.category = Category.objects.create(
+            name='Тестовая категория',
+            description='Тестовое описание категории',
+            image=SimpleUploadedFile(
+                'test.jpg', b'something'),
+            slug='test_category',
+            meta_title='test_meta_title',
+            meta_description='test_meta_description'
+        )
+        cls.countryproduct = CountryProduct.objects.create(
+            name="Тестовая страна"
+        )
+        cls.brand = Brand.objects.create(
+            name='Тестовый бренд',
+            description='Описание тестового бренда',
+            slug='test_brand'
+        )
+        cls.product = Product.objects.create(
+            name="Тестовый товар",
+            price=1000.00,
+            quantity=100,
+            brand=cls.brand,
+            category=cls.category,
+            image=SimpleUploadedFile(
+                "test2.jpg", b"something2"
+            ),
+            description="Тестовое описание товара",
+            country=cls.countryproduct,
+            slug="test_product"
+        )
+
+    def test_product_model_have_correct_object_name(self):
+        """
+        Тестирование корректности отображения
+        __str__ у модели товаров.
+        """
+
+        product = ProductModelTest.product
+        expected_product_name = product.name
+        self.assertAlmostEqual(
+            expected_product_name, str(product))
+
+    def test_product_verbose_name(self):
+        """
+        Тестирование verbose_name у модели
+        товаров.
+        """
+
+        product = ProductModelTest.product
+        field_verboses = {
+            "name": "Наименование",
+            "price": "Стоимость",
+            "brand": "Бренд",
+            "category": "Категория",
+            "image": "Изображение",
+            "description": "Описание",
+            "country": "Страна",
+            "slug": "Слаг"
+        }
+        for field_name, expected_value in field_verboses.items():
+            with self.subTest(field_name=field_name):
+                self.assertEqual(
+                    product._meta.get_field(
+                        field_name).verbose_name, expected_value)
