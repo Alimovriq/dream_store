@@ -17,6 +17,7 @@ from products.models import (
 
 
 MEDIA_ROOT = tempfile.mkdtemp()
+USER = get_user_model()
 
 
 @override_settings(MEDIA_ROOT=MEDIA_ROOT)
@@ -214,7 +215,7 @@ class ProductModelTest(TestCase):
 
         product = ProductModelTest.product
         expected_product_name = product.name
-        self.assertAlmostEqual(
+        self.assertEqual(
             expected_product_name, str(product))
 
     def test_product_verbose_name(self):
@@ -239,3 +240,66 @@ class ProductModelTest(TestCase):
                 self.assertEqual(
                     product._meta.get_field(
                         field_name).verbose_name, expected_value)
+
+
+class Shop_basketTest(TestCase):
+    """
+    Тестирование модели корзина.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.category = Category.objects.create(
+            name='Тестовая категория',
+            description='Тестовое описание категории',
+            image=SimpleUploadedFile(
+                'test.jpg', b'something'),
+            slug='test_category',
+            meta_title='test_meta_title',
+            meta_description='test_meta_description'
+        )
+        cls.countryproduct = CountryProduct.objects.create(
+            name="Тестовая страна"
+        )
+        cls.brand = Brand.objects.create(
+            name='Тестовый бренд',
+            description='Описание тестового бренда',
+            slug='test_brand'
+        )
+        cls.product = Product.objects.create(
+            name="Тестовый товар",
+            price=1000.00,
+            quantity=100,
+            brand=cls.brand,
+            category=cls.category,
+            image=SimpleUploadedFile(
+                "test2.jpg", b"something2"
+            ),
+            description="Тестовое описание товара",
+            country=cls.countryproduct,
+            slug="test_product"
+        )
+        cls.customer = USER.objects.create(
+            email='test@test.com',
+            password='test123'
+        )
+        cls.shop_basket = Shop_basket.objects.create(
+            customer=cls.customer
+        )
+        cls.shop_basket.products.add(
+            cls.product)
+
+    def test_shop_basket_model_have_correct_object_name(self):
+        """
+        Тестирование корректности отображения
+        __str__ у модели корзина.
+        """
+
+        shop_basket = Shop_basketTest.shop_basket.__str__()
+        expected_value = f'Корзина для {self.customer}'
+        self.assertEqual(shop_basket, expected_value)
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
