@@ -300,6 +300,35 @@ class Shop_basketTest(TestCase):
         expected_value = f'Корзина для {self.customer}'
         self.assertEqual(shop_basket, expected_value)
 
+    def test_shop_basket_verbose_name(self):
+        """
+        Тестирование verbose_name у
+        модели shop_basket.
+        """
+
+        shop_basket = Shop_basketTest.shop_basket
+        field_verboses = {
+            'products': 'Товары',
+            'customer': 'Покупатель'
+        }
+        for field_name, expected_value in field_verboses.items():
+            with self.subTest(field_name=field_name):
+                self.assertEqual(
+                    shop_basket._meta.get_field(
+                        field_name).verbose_name, expected_value
+                )
+
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
+
+    # class Shop_basket_itemsTest(TestCase):
+    #     """
+    #     Тестирование модели товаров 
+    #     для корзины.
+    #     """
+
+    #     @classmethod
+    #     def setUpClas(cls):
+    #         super().setUpClass()
+    #         cls.
