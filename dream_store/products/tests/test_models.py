@@ -1,5 +1,7 @@
+import shutil
 import tempfile
 
+from django.conf import settings
 from django.test import TestCase, override_settings
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
@@ -15,11 +17,11 @@ from products.models import (
     OrderItems,)
 
 
-MEDIA_ROOT = tempfile.mkdtemp()
+TEMP_MEDIA_ROOT = tempfile.mkdtemp(dir=settings.BASE_DIR)
 USER = get_user_model()
 
 
-@override_settings(MEDIA_ROOT=MEDIA_ROOT)
+@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class CategoryModelTest(TestCase):
     """
     Тестирование модели категорий.
@@ -71,6 +73,9 @@ class CategoryModelTest(TestCase):
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
+        shutil.rmtree(
+            TEMP_MEDIA_ROOT,
+            ignore_errors=True)
 
 
 class BrandModelTest(TestCase):
@@ -117,6 +122,9 @@ class BrandModelTest(TestCase):
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
+        shutil.rmtree(
+            TEMP_MEDIA_ROOT,
+            ignore_errors=True)
 
 
 class CountryProductModelTest(TestCase):
@@ -164,9 +172,12 @@ class CountryProductModelTest(TestCase):
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
+        shutil.rmtree(
+            TEMP_MEDIA_ROOT,
+            ignore_errors=True)
 
 
-@override_settings(MEDIA_ROOT=MEDIA_ROOT)
+@override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
 class ProductModelTest(TestCase):
     """
     Тестирование модели товаров.
@@ -320,6 +331,10 @@ class Shop_basketTest(TestCase):
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
+        shutil.rmtree(
+            TEMP_MEDIA_ROOT,
+            ignore_errors=True)
+
 
 
 class Shop_basket_itemsTest(TestCase):
@@ -406,6 +421,10 @@ class Shop_basket_itemsTest(TestCase):
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
+        shutil.rmtree(
+            TEMP_MEDIA_ROOT,
+            ignore_errors=True)
+
 
 
 class OrderTest(TestCase):
@@ -494,6 +513,9 @@ class OrderTest(TestCase):
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
+        shutil.rmtree(
+            TEMP_MEDIA_ROOT,
+            ignore_errors=True)
 
 
 class OrderItemsTest(TestCase):
@@ -586,3 +608,6 @@ class OrderItemsTest(TestCase):
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
+        shutil.rmtree(
+            TEMP_MEDIA_ROOT,
+            ignore_errors=True)
