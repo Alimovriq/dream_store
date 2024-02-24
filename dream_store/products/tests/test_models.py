@@ -578,7 +578,7 @@ class OrderItemsTest(TestCase):
         }
         for field_name, expected_value in verbose_name.items():
             with self.subTest(field_name):
-                return self.assertEqual(
+                self.assertEqual(
                     expected_value,
                     orderitems._meta.get_field(
                         field_name).verbose_name)
