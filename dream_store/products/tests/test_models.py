@@ -1,4 +1,3 @@
-import shutil
 import tempfile
 
 from django.test import TestCase, override_settings
@@ -88,7 +87,7 @@ class BrandModelTest(TestCase):
             slug='test_brand'
         )
 
-    def test_brand_have_correct_object_name(self):
+    def test_brand_model_have_correct_object_name(self):
         """
         Тестирование корректности отображения
         __str__ у модели брендов.
@@ -144,7 +143,7 @@ class CountryProductModelTest(TestCase):
             expected_countryproduct_name,
             str(countryproduct))
 
-    def test_countryproduct_verbose_name(self):
+    def test_countryproduct_model_verbose_name(self):
         """
         Тестирование verbose_name у модели
         стран для товаров.
@@ -218,7 +217,7 @@ class ProductModelTest(TestCase):
         self.assertEqual(
             expected_product_name, str(product))
 
-    def test_product_verbose_name(self):
+    def test_product_model_verbose_name(self):
         """
         Тестирование verbose_name у модели
         товаров.
@@ -300,7 +299,7 @@ class Shop_basketTest(TestCase):
         expected_value = f'Корзина для {self.customer}'
         self.assertEqual(shop_basket, expected_value)
 
-    def test_shop_basket_verbose_name(self):
+    def test_shop_basket_model_verbose_name(self):
         """
         Тестирование verbose_name у
         модели shop_basket.
@@ -375,7 +374,7 @@ class Shop_basket_itemsTest(TestCase):
             quantity=100
         )
 
-    def test_shop_basket_item_have_correct_object_name(self):
+    def test_shop_basket_item_model_have_correct_object_name(self):
         """
         Тестирование корректности отображения
         __str__ у модели товаров для корзины.
@@ -385,7 +384,7 @@ class Shop_basket_itemsTest(TestCase):
         expected_value = f'Объект корзины с {shop_basket_item.product} в кол-ве {shop_basket_item.quantity} ед.'
         return self.assertEqual(str(shop_basket_item), expected_value)
 
-    def test_shop_basket_item_verbose_name(self):
+    def test_shop_basket_item_model_verbose_name(self):
         """
         Тестирование verbose_name у
         модели товаров для корзны.
@@ -470,7 +469,7 @@ class OrderTest(TestCase):
         expected_value = f'Заказ № {order.pk}'
         return self.assertEqual(expected_value, str(order))
 
-    def test_order_verbose_name(self):
+    def test_order_model_verbose_name(self):
         """
         Тестирование корректности отображения
         verbose_name у модели заказов.
@@ -490,6 +489,98 @@ class OrderTest(TestCase):
                 self.assertEqual(
                     expected_value,
                     order._meta.get_field(
+                        field_name).verbose_name)
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+
+
+class OrderItemsTest(TestCase):
+    """
+    Тестирование модели товаров
+    для заказов.
+    """
+
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.category = Category.objects.create(
+            name='Тестовая категория',
+            description='Тестовое описание категории',
+            image=SimpleUploadedFile(
+                'test.jpg', b'something'),
+            slug='test_category',
+            meta_title='test_meta_title',
+            meta_description='test_meta_description'
+        )
+        cls.countryproduct = CountryProduct.objects.create(
+            name="Тестовая страна"
+        )
+        cls.brand = Brand.objects.create(
+            name='Тестовый бренд',
+            description='Описание тестового бренда',
+            slug='test_brand'
+        )
+        cls.product = Product.objects.create(
+            name="Тестовый товар",
+            price=1000.00,
+            quantity=100,
+            brand=cls.brand,
+            category=cls.category,
+            image=SimpleUploadedFile(
+                "test2.jpg", b"something2"
+            ),
+            description="Тестовое описание товара",
+            country=cls.countryproduct,
+            slug="test_product"
+        )
+        cls.customer = USER.objects.create(
+            email='test@test.com',
+            password='test123'
+        )
+        cls.order = Order.objects.create(
+            customer=cls.customer,
+            total_price=1000,
+            created_at='24 января 2024 г. 17:23'
+            )
+        cls.address = 'Тестовый адрес доставки'
+        cls.is_payed = False
+        cls.orderitems = OrderItems.objects.create(
+            order=cls.order,
+            product=cls.product,
+            quantity=100
+        )
+
+    def test_orderitems_model_have_correct_object_name(self):
+        """
+        Тестирование корректности отображения
+        __str__ у модели товаров для заказов.
+        """
+
+        orderitems = OrderItemsTest.orderitems
+        expected_value = f'{orderitems.product.name} ({orderitems.quantity})'
+        return self.assertEqual(
+            expected_value, str(orderitems))
+
+    def test_orderitems_model_verbose_name(self):
+        """
+        Тестирование корректности отображения
+        verbose_name у модели товаров для
+        заказов.
+        """
+
+        orderitems = OrderItemsTest.orderitems
+        verbose_name = {
+            'order': 'Заказ',
+            'product': 'Товар',
+            'quantity': 'Количество'
+        }
+        for field_name, expected_value in verbose_name.items():
+            with self.subTest(field_name):
+                return self.assertEqual(
+                    expected_value,
+                    orderitems._meta.get_field(
                         field_name).verbose_name)
 
     @classmethod
