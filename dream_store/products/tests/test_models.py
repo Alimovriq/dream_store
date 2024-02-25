@@ -122,9 +122,6 @@ class BrandModelTest(TestCase):
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
-        shutil.rmtree(
-            TEMP_MEDIA_ROOT,
-            ignore_errors=True)
 
 
 class CountryProductModelTest(TestCase):
@@ -172,9 +169,6 @@ class CountryProductModelTest(TestCase):
     @classmethod
     def tearDownClass(cls):
         super().tearDownClass()
-        shutil.rmtree(
-            TEMP_MEDIA_ROOT,
-            ignore_errors=True)
 
 
 @override_settings(MEDIA_ROOT=TEMP_MEDIA_ROOT)
@@ -250,6 +244,13 @@ class ProductModelTest(TestCase):
                 self.assertEqual(
                     product._meta.get_field(
                         field_name).verbose_name, expected_value)
+
+    @classmethod
+    def tearDownClass(cls):
+        super().tearDownClass()
+        shutil.rmtree(
+            TEMP_MEDIA_ROOT,
+            ignore_errors=True)
 
 
 class Shop_basketTest(TestCase):
@@ -334,7 +335,6 @@ class Shop_basketTest(TestCase):
         shutil.rmtree(
             TEMP_MEDIA_ROOT,
             ignore_errors=True)
-
 
 
 class Shop_basket_itemsTest(TestCase):
@@ -426,7 +426,6 @@ class Shop_basket_itemsTest(TestCase):
             ignore_errors=True)
 
 
-
 class OrderTest(TestCase):
     """
     Тестирование модели заказов.
@@ -472,11 +471,11 @@ class OrderTest(TestCase):
         cls.order = Order.objects.create(
             customer=cls.customer,
             total_price=1000,
-            created_at='24 января 2024 г. 17:23'
+            created_at='24 января 2024 г. 17:23',
+            address='Тестовый адрес доставки',
+            is_payed=False
             )
         cls.order.products.add(cls.product)
-        cls.address = 'Тестовый адрес доставки'
-        cls.is_payed = False
 
     def test_order_model_have_correct_object_name(self):
         """
@@ -486,7 +485,7 @@ class OrderTest(TestCase):
 
         order = OrderTest.order
         expected_value = f'Заказ № {order.pk}'
-        return self.assertEqual(expected_value, str(order))
+        self.assertEqual(expected_value, str(order))
 
     def test_order_model_verbose_name(self):
         """
@@ -564,10 +563,9 @@ class OrderItemsTest(TestCase):
         cls.order = Order.objects.create(
             customer=cls.customer,
             total_price=1000,
-            created_at='24 января 2024 г. 17:23'
-            )
-        cls.address = 'Тестовый адрес доставки'
-        cls.is_payed = False
+            created_at='24 января 2024 г. 17:23',
+            address='Тестовый адрес доставки',
+            is_payed=False)
         cls.orderitems = OrderItems.objects.create(
             order=cls.order,
             product=cls.product,
@@ -582,8 +580,7 @@ class OrderItemsTest(TestCase):
 
         orderitems = OrderItemsTest.orderitems
         expected_value = f'{orderitems.product.name} ({orderitems.quantity})'
-        return self.assertEqual(
-            expected_value, str(orderitems))
+        self.assertEqual(expected_value, str(orderitems))
 
     def test_orderitems_model_verbose_name(self):
         """
