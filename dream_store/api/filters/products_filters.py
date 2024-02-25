@@ -16,6 +16,8 @@ class ProductFilter(filters.FilterSet):
                                   lookup_expr='icontains')
     brand = filters.CharFilter(field_name='brand__name',
                                lookup_expr='icontains')
+    country = filters.CharFilter(field_name='country__name',
+                                 lookup_expr='icontains')
 
     class Meta:
         model = Product
