@@ -77,7 +77,7 @@ class ProductsViewsTests(TestCase):
             ),
             description="Тестовое описание товара №1",
             country=cls.countryproduct_1,
-            slug='test_produc_1'
+            slug='test_product_1'
         )
         cls.product_2 = Product.objects.create(
             name='Тестовый товар №2',
@@ -204,6 +204,46 @@ class ProductsViewsTests(TestCase):
         self.assertEqual(
             1, products_count,
             'Пользователь получил неверный список товаров по фильтру <= 2000')
+
+    def test_unauth_user_list_products_search_by_name(self):
+        """
+        Получение неавторизованным пользователем списка товаров,
+        в результате поиска search=Тестовый.
+        """
+
+        address = '/api/v1/products/?search=Тестовый'
+        response = self.unauthorized_client.get(address)
+        products_count = len(response.data.get('results'))
+        self.assertEqual(
+            2, products_count,
+            'Пользователь получил неверный список товаров по поиску Тестовый')
+
+    def test_unauth_user_list_products_ordering(self):
+        """
+        Получение неавторизованный пользователем списка товаров,
+        в резульатате сортировки по name, price, quanaity полям.
+        """
+
+        values = ['name', 'price', 'quantity']
+        product_1 = ProductsViewsTests.product_1
+        product_2 = ProductsViewsTests.product_2
+        for value in values:
+            address = f'/api/v1/products/?ordering={value}'
+            response = self.unauthorized_client.get(address)
+            data = response.data.get('results')[0]
+            if value == 'name':
+                self.assertEqual(
+                    product_1.name, data['name'],
+                    'Сортировка по полю <name> работает неверно')
+            elif value == 'price':
+                self.assertEqual(
+                    product_1.price, float(data['price']),
+                    'Сортировка по полю <price> работает неверно')
+            else:
+                self.assertEqual(
+                    product_2.quantity, (
+                        data['quantity'] + self.orderitems.quantity),
+                    'Сортировка по полю <quantity> работает неверно')
 
     @classmethod
     def tearDownClass(cls):
