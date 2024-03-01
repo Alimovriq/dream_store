@@ -6,7 +6,7 @@ from api.serializers.shop_basket_serializers import (
     ShopBasketItemCreateSerializer, ShopBasketUpdateSerializer,
     ShopBasketSerializer, ShopBasketItemIncreaseSerializer,
     ShopBasketItemDecreaseSerializer,)
-from products.models import Shop_basket
+from shop_basket.models import Shop_basket
 
 # Функции для работы с корзиной через views для API
 

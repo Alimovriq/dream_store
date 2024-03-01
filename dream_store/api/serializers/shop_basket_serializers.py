@@ -1,7 +1,7 @@
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
-from products.models import (
-    Product, Shop_basket, Shop_basket_items,)
+from products.models import Product
+from shop_basket.models import Shop_basket, Shop_basket_items
 
 
 class ProductShopBasketListSerializer(serializers.ModelSerializer):
@@ -17,8 +17,9 @@ class ProductShopBasketListSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Shop_basket_items
-        fields = ('name', 'quantity',
-                  'image', 'slug', 'total_price',)
+        fields = (
+            'name', 'quantity',
+            'image', 'slug', 'total_price',)
 
     def get_name(self, obj):
         return obj.product.name
@@ -65,9 +66,10 @@ class ShopBasketSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Shop_basket
-        fields = ('id', 'products',
-                  'total_basket_price',
-                  'total_quantity_of_products',)
+        fields = (
+            'id', 'products',
+            'total_basket_price',
+            'total_quantity_of_products',)
 
     def get_total_basket_price(self, obj):
         """
@@ -104,8 +106,9 @@ class ShopBasketItemCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Shop_basket_items
-        fields = ('shop_basket',
-                  'product', 'quantity',)
+        fields = (
+            'shop_basket',
+            'product', 'quantity',)
         validators = [
             UniqueTogetherValidator(
                 queryset=Shop_basket_items.objects.all(),
@@ -124,8 +127,9 @@ class ShopBasketItemIncreaseSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = Shop_basket_items
-        fields = ('shop_basket',
-                  'product',)
+        fields = (
+            'shop_basket',
+            'product',)
 
     def create(self, validated_data):
         shop_basket = validated_data['shop_basket']

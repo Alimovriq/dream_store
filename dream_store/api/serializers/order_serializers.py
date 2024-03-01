@@ -3,7 +3,8 @@ from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 from products.models import (
-    Product, Shop_basket, Order, OrderItems,)
+    Product, Order, OrderItems,)
+from shop_basket.models import Shop_basket
 
 USER = get_user_model()
 
@@ -20,8 +21,9 @@ class ProductOrderSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderItems
-        fields = ('name', 'quantity',
-                  'image', 'slug', 'total_price',)
+        fields = (
+            'name', 'quantity',
+            'image', 'slug', 'total_price',)
 
     def get_name(self, obj):
         return obj.product.name
@@ -50,8 +52,9 @@ class OrderItemCreateSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = OrderItems
-        fields = ('order',
-                  'product', 'quantity',)
+        fields = (
+            'order',
+            'product', 'quantity',)
         validators = [
             UniqueTogetherValidator(
                 queryset=OrderItems.objects.all(),

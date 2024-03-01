@@ -32,6 +32,7 @@ INSTALLED_APPS = [
     'djoser',
     'django_filters',
     'products',
+    'shop_basket',
     'news',
     'users',
     'api',
@@ -123,7 +124,7 @@ STATIC_ROOT = BASE_DIR / 'collected_static'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
 
-# Это для дебаггинга, в продакшене smtp 
+# Это для дебаггинга, в продакшене smtp
 EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'

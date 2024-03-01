@@ -1,7 +1,7 @@
 from rest_framework import permissions
 from rest_framework.views import APIView
 from rest_framework.generics import GenericAPIView
-from products.models import Shop_basket
+from shop_basket.models import Shop_basket
 from api.views.utils.shop_basket_utils import (
     process_shop_basket, increase_item_value,
     decrease_item_value,)
