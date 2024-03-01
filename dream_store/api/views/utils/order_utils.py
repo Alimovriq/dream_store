@@ -2,8 +2,8 @@ from typing import Any
 from rest_framework import status
 from rest_framework.response import Response
 
-from products.models import (
-    Order, Shop_basket, Shop_basket_items,)
+from products.models import Order
+from shop_basket.models import Shop_basket, Shop_basket_items
 
 
 def create_order_items(order_obj: Any, shop_basket_obj: Any) -> dict:
