@@ -6,5 +6,5 @@ class ProductsConfig(AppConfig):
     name = 'products'
     verbose_name = 'Управление товарами'
 
-    def ready(self) -> None:
-        import products.signals
+    # def ready(self) -> None:
+    #     import products.signals

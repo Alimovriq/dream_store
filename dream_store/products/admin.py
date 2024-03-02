@@ -4,7 +4,8 @@ from django.utils.html import format_html
 from .models import (
     Product, Category,
     # Shop_basket, Shop_basket_items,
-    Order, OrderItems, Brand, CountryProduct)
+    # Order, OrderItems,
+    Brand, CountryProduct)
 
 
 # class ShopBasketProductInline(admin.TabularInline):
@@ -12,9 +13,9 @@ from .models import (
 #     extra = 1
 
 
-class OrderProductInline(admin.TabularInline):
-    model = OrderItems
-    extra = 1
+# class OrderProductInline(admin.TabularInline):
+#     model = OrderItems
+#     extra = 1
 
 
 @admin.register(Brand)
@@ -175,43 +176,43 @@ class CategoryAdmin(admin.ModelAdmin):
 #     search_fields = ('shop_basket',)
 
 
-@admin.register(Order)
-class OrderAdmin(admin.ModelAdmin):
-    """
-    Админка для заказов.
-    """
+# @admin.register(Order)
+# class OrderAdmin(admin.ModelAdmin):
+#     """
+#     Админка для заказов.
+#     """
 
-    list_display = (
-        'pk',
-        'customer',
-        'total_price',
-        'created_at',
-        'address',
-        'is_payed',
-    )
-    list_filter = (
-        'customer',
-        'is_payed',
-        'created_at',
-        'total_price',)
-    filter_horizontal = ('products',)
-    ordering = ('-created_at',)
-    search_fields = ('customer', 'address',)
-    inlines = (OrderProductInline,)
+#     list_display = (
+#         'pk',
+#         'customer',
+#         'total_price',
+#         'created_at',
+#         'address',
+#         'is_payed',
+#     )
+#     list_filter = (
+#         'customer',
+#         'is_payed',
+#         'created_at',
+#         'total_price',)
+#     filter_horizontal = ('products',)
+#     ordering = ('-created_at',)
+#     search_fields = ('customer', 'address',)
+#     inlines = (OrderProductInline,)
 
 
-@admin.register(OrderItems)
-class OrderItemsAdmin(admin.ModelAdmin):
-    """
-    Админка для заказов.
-    """
+# @admin.register(OrderItems)
+# class OrderItemsAdmin(admin.ModelAdmin):
+#     """
+#     Админка для заказов.
+#     """
 
-    list_display = (
-        'pk',
-        'order',
-        'product',
-        'quantity'
-    )
-    list_filter = ('order', 'product',)
-    list_editable = ('quantity',)
-    search_fields = ('order', 'product',)
+#     list_display = (
+#         'pk',
+#         'order',
+#         'product',
+#         'quantity'
+#     )
+#     list_filter = ('order', 'product',)
+#     list_editable = ('quantity',)
+#     search_fields = ('order', 'product',)

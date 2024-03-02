@@ -1,6 +1,8 @@
 from django.db.models.signals import pre_save, pre_delete
 from django.dispatch import receiver
-from .models import Product, Order, OrderItems
+
+from orders.models import Order, OrderItems
+from products.models import Product
 
 
 @receiver(pre_save, sender=OrderItems)
