@@ -88,6 +88,9 @@ def get_operations_in_orders(
 
     context = {'host': request.get_host()}
     serializer = serializer(queryset, many=True, context=context)
+    if len(queryset) == 0:
+        return Response(
+            {'detail': 'заказы отсутствуют'}, status=status.HTTP_200_OK)
     return Response(serializer.data, status=status.HTTP_200_OK)
 
 
