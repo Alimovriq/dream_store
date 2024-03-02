@@ -3,8 +3,8 @@ from rest_framework.permissions import SAFE_METHODS
 from rest_framework.generics import GenericAPIView
 
 from api.views.utils.order_utils import process_order
-from products.models import Order
-from api.serializers.order_serializers import (
+from orders.models import Order
+from api.serializers.orders_serializers import (
     OrderListSerializer, OrderCreateSerializer,)
 
 

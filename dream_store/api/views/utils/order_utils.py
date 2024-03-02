@@ -2,7 +2,7 @@ from typing import Any
 from rest_framework import status
 from rest_framework.response import Response
 
-from products.models import Order
+from orders.models import Order
 from shop_basket.models import Shop_basket, Shop_basket_items
 
 
