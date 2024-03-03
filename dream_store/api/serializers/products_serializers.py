@@ -83,7 +83,8 @@ class ProductSerializer(serializers.ModelSerializer):
         fields = (
             'id', 'name', 'price', 'quantity',
             'brand', 'country', 'image',
-            'description', 'category', 'slug',
+            'description', 'category',
+            'vendor_code', 'slug',
         )
 
 
@@ -100,7 +101,8 @@ class ProductDetailSerializer(ProductSerializer):
         fields = (
             'id', 'name', 'price', 'quantity',
             'brand', 'country', 'image',
-            'description', 'category', 'slug',
+            'description', 'category',
+            'vendor_code', 'slug',
             'meta_title', 'meta_description',
         )
 

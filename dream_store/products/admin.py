@@ -42,6 +42,7 @@ class ProductAdmin(admin.ModelAdmin):
 
     list_display = (
         'pk',
+        'vendor_code',
         'name',
         'price',
         'quantity',
@@ -55,7 +56,7 @@ class ProductAdmin(admin.ModelAdmin):
         'slug',
     )
     list_filter = ('name', 'brand', 'country',)
-    search_fields = ('name',)
+    search_fields = ('name', 'vendor_code')
     list_editable = ('price', 'description', 'quantity')
     ordering = ('-name',)
 

@@ -28,7 +28,7 @@ class ProductList(generics.ListCreateAPIView):
         django_filters.DjangoFilterBackend,
         filters.SearchFilter, filters.OrderingFilter,)
     filterset_class = ProductFilter
-    search_fields = ('^name',)
+    search_fields = ('^name', 'vendor_code')
     ordering_fields = ('name', 'price', 'quantity')
     ordering = ('name',)
 
