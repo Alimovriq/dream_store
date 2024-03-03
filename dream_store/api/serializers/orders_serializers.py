@@ -1,4 +1,3 @@
-
 from django.contrib.auth import get_user_model
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
@@ -16,6 +15,7 @@ class ProductOrderSerializer(serializers.ModelSerializer):
 
     name = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
+    vendor_code = serializers.SerializerMethodField()
     slug = serializers.SerializerMethodField()
     total_price = serializers.SerializerMethodField()
 
@@ -23,7 +23,8 @@ class ProductOrderSerializer(serializers.ModelSerializer):
         model = OrderItems
         fields = (
             'name', 'quantity',
-            'image', 'slug', 'total_price',)
+            'image', 'vendor_code',
+            'slug', 'total_price',)
 
     def get_name(self, obj):
         return obj.product.name
@@ -34,6 +35,9 @@ class ProductOrderSerializer(serializers.ModelSerializer):
             full_url = request + obj.product.image.url
             return full_url
         return 'null'
+
+    def get_vendor_code(self, obj):
+        return obj.product.vendor_code
 
     def get_slug(self, obj):
         return obj.product.slug

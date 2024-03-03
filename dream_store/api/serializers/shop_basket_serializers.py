@@ -12,6 +12,7 @@ class ProductShopBasketListSerializer(serializers.ModelSerializer):
     name = serializers.SerializerMethodField()
     quantity = serializers.SerializerMethodField()
     image = serializers.SerializerMethodField()
+    vendor_code = serializers.SerializerMethodField()
     slug = serializers.SerializerMethodField()
     total_price = serializers.SerializerMethodField()
 
@@ -19,7 +20,8 @@ class ProductShopBasketListSerializer(serializers.ModelSerializer):
         model = Shop_basket_items
         fields = (
             'name', 'quantity',
-            'image', 'slug', 'total_price',)
+            'image', 'vendor_code',
+            'slug', 'total_price',)
 
     def get_name(self, obj):
         return obj.product.name
@@ -33,6 +35,9 @@ class ProductShopBasketListSerializer(serializers.ModelSerializer):
             full_url = request + obj.product.image.url
             return full_url
         return 'null'
+
+    def get_vendor_code(self, obj):
+        return obj.product.vendor_code
 
     def get_slug(self, obj):
         return obj.product.slug

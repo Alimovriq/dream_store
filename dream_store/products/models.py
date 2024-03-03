@@ -152,6 +152,9 @@ class Product(BasicMetaData):
         CountryProduct, on_delete=models.CASCADE,
         help_text='Выберите страну производства',
         verbose_name='Страна')
+    vendor_code = models.PositiveIntegerField(
+        verbose_name='Код товара',
+        help_text='Введите код товара')
     slug = models.SlugField(
         unique=True,
         max_length=50,
@@ -161,6 +164,12 @@ class Product(BasicMetaData):
     class Meta:
         verbose_name = 'Товар'
         verbose_name_plural = 'Товары'
+        constraints = [
+            models.UniqueConstraint(
+                fields=[
+                    'name', 'vendor_code'],
+                name='unique_name_vendor_code')]
 
     def __str__(self) -> str:
         return self.name
+
