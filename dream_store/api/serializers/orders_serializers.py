@@ -67,9 +67,9 @@ class OrderItemCreateSerializer(serializers.ModelSerializer):
         ]
 
 
-class OrderListSerializer(serializers.ModelSerializer):
+class OrderSerializer(serializers.ModelSerializer):
     """
-    Сериализует данные для получения списка заказов пользователя.
+    Сериализует данные для получения заказов пользователя.
     """
 
     customer = serializers.SlugRelatedField(
