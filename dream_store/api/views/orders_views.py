@@ -18,6 +18,7 @@ class OrderList(ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
+        # Надо ли проверку на методы?
         if self.request.method in SAFE_METHODS:
             return Order.objects.filter(
                 customer=self.request.user).order_by(
