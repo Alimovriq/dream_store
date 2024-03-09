@@ -8,10 +8,81 @@ from products.models import Product
 USER = get_user_model()
 
 
+class OrderItemsRefund(models.Model):
+    """
+    Модель с конкретными позициями
+    для отказа в Заказе.
+    """
+
+    order_item = models.ForeignKey(
+        'OrderItems',
+        on_delete=models.CASCADE,
+        verbose_name='Возвращаемый товар',
+        related_name='refunds',
+        help_text='id товара в Заказе'
+    )
+    refund = models.ForeignKey(
+        'OrderRefund',
+        on_delete=models.CASCADE,
+        verbose_name='Возврат',
+        related_name='orderitemsrefunds',
+        help_text='id возвращаемого Заказа'
+    )
+    quantity = models.PositiveBigIntegerField(
+        verbose_name='Количество',
+        help_text='Количество'
+    )
+
+    class Meta:
+        verbose_name = 'Возвращаемый товар'
+        verbose_name_plural = 'Возвращаемые товары'
+
+    def __str__(self) -> str:
+        return f'Вовзарат {self.order_item.name} - {self.quantity}'
+
+
+class OrderRefund(models.Model):
+    """
+    Модель для отказа от Заказа (возврат).
+    """
+
+    order = models.ForeignKey(
+        'Order',
+        on_delete=models.CASCADE,
+        verbose_name='Заказ',
+        help_text='id Заказа',
+        related_name='refunds'
+    )
+    created_at = models.DateTimeField(
+        verbose_name='Дата создания',
+        auto_now_add=True,
+        help_text='Дата создания'
+    )
+    comment = models.TextField(
+        verbose_name='Комментарий',
+        blank=True,
+        null=True,
+        help_text='текст для комментария'
+    )
+
+    class Meta:
+        verbose_name = 'Возврат'
+        verbose_name_plural = 'Возвраты'
+
+    def __str__(self) -> str:
+        return f'Создан возврат № {self.pk}'
+
+
 class Order(models.Model):
     """
     Общая модель для заказов.
     """
+
+    CHOICES = (
+        ('AC', 'Активный'),
+        ('EN', 'Завершенный'),
+        ('CA', 'Отмененный')
+    )
 
     customer = models.ForeignKey(
         USER,
@@ -32,10 +103,24 @@ class Order(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата заказа')
+    phone = models.PositiveIntegerField(
+        verbose_name='Номер телефона',
+        help_text='Телефон, формат: 79687773366')
+    email = models.EmailField(
+        verbose_name='Email',
+        help_text='Укажите Email')
+    comment = models.TextField(
+        max_length=500,
+        verbose_name='Комментарий',
+        help_text='Введите комментарий')
     address = models.TextField(
         max_length=500,
         help_text='Введите адрес доставки',
         verbose_name='Адрес доставки')
+    status = models.CharField(
+        verbose_name='Статус Заказа',
+        choices=CHOICES,
+        max_length=300)
     is_payed = models.BooleanField(
         default=False,
         help_text='Укажите статус оплаты',
