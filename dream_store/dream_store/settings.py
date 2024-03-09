@@ -34,6 +34,7 @@ INSTALLED_APPS = [
     'products',
     'shop_basket',
     'orders',
+    'payment',
     'news',
     'users',
     'api',

@@ -80,8 +80,17 @@ class OrderSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = (
-            'id', 'customer', 'products', 'total_price',
-            'created_at', 'address', 'is_payed',)
+            'id',
+            'customer',
+            'products', 
+            'total_price',
+            'created_at',
+            'phone',
+            'email',
+            'comment',
+            'address',
+            'status',
+            'is_payed',)
         read_only_fields = fields
 
 
@@ -97,15 +106,29 @@ class OrderCreateSerializer(serializers.ModelSerializer):
     class Meta:
         model = Order
         fields = (
-            'id', 'customer', 'products', 'total_price',
-            'created_at', 'address', 'is_payed',)
+            'id',
+            'customer',
+            'products',
+            'total_price',
+            'created_at',
+            'phone',
+            'email',
+            'comment',
+            'address',
+            'is_payed',)
         read_only_fields = (
-            'id', 'total_price', 'created_at', 'is_payed',)
+            'id',
+            'total_price',
+            'created_at',
+            'is_payed',)
 
     def create(self, validated_data):
         customer = validated_data.get('customer')
         products = validated_data.get('products')
         address = validated_data.get('address')
+        phone = validated_data.get('phone')
+        email = validated_data.get('email')
+        comment = validated_data.get('comment', 'null')
 
         for item in products:
             OrderItems.objects.create(
@@ -116,6 +139,9 @@ class OrderCreateSerializer(serializers.ModelSerializer):
 
         order_obj = Order.objects.all()[::-1][0]
         order_obj.address = address
+        order_obj.phone = phone
+        order_obj.email = email
+        order_obj.comment = comment
         order_obj.save()
 
         shop_basket_obj = Shop_basket.objects.filter(customer=customer)

@@ -1,4 +1,3 @@
-from django.shortcuts import get_object_or_404
 from rest_framework import permissions
 from rest_framework.permissions import SAFE_METHODS
 from rest_framework.generics import ListCreateAPIView, RetrieveAPIView
@@ -18,7 +17,7 @@ class OrderList(ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Надо ли проверку на методы?
+        # Надо ли проверку метода?
         if self.request.method in SAFE_METHODS:
             return Order.objects.filter(
                 customer=self.request.user).order_by(
@@ -56,8 +55,3 @@ class OrderRetrieve(RetrieveAPIView):
     def get_queryset(self):
         customer = self.request.user
         return Order.objects.filter(customer=customer)
-
-# Надо переделать верхенее представление так, чтобы оно был на LIST
-# Написать еще одну вьюху, которая показывает детаельно, по pk
-# На основе этого написать API для payments?
-# class OrderPaymentView()

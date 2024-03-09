@@ -40,6 +40,7 @@ def create_order(customer: Any) -> Any:
     для пользователя.
     """
 
+    print('STARTED')
     Order.objects.create(customer=customer)
     qs = Order.objects.all()
     order_obj = qs[::-1][0]
@@ -60,7 +61,6 @@ def post_operations_in_orders(request: Any, serializer: Any) -> Response:
         if len(shop_basket_obj.products.all()) > 0:
 
             order_obj = create_order(customer=customer)
-
             data = create_order_items(order_obj, shop_basket_obj)
             data.update({'customer': customer})
             request.data.update(data)

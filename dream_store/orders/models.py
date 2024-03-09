@@ -1,3 +1,4 @@
+from email.policy import default
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -79,9 +80,9 @@ class Order(models.Model):
     """
 
     CHOICES = (
-        ('AC', 'Активный'),
-        ('EN', 'Завершенный'),
-        ('CA', 'Отмененный')
+        ('ACTIVE', 'Активный'),
+        ('ENDED', 'Завершенный'),
+        ('CANCELLED', 'Отмененный')
     )
 
     customer = models.ForeignKey(
@@ -103,8 +104,9 @@ class Order(models.Model):
     created_at = models.DateTimeField(
         auto_now_add=True,
         verbose_name='Дата заказа')
-    phone = models.PositiveIntegerField(
+    phone = models.CharField(
         verbose_name='Номер телефона',
+        max_length=14,
         help_text='Телефон, формат: 79687773366')
     email = models.EmailField(
         verbose_name='Email',
@@ -120,6 +122,7 @@ class Order(models.Model):
     status = models.CharField(
         verbose_name='Статус Заказа',
         choices=CHOICES,
+        default=CHOICES[0][0],
         max_length=300)
     is_payed = models.BooleanField(
         default=False,
