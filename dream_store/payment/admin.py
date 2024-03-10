@@ -1,17 +1,20 @@
 from django.contrib import admin
 
-from .models import OrderPaymenet
+from .models import OrderPayment
 
 
-@admin.register(OrderPaymenet)
+@admin.register(OrderPayment)
 class OrderPaymentAdmin(admin.ModelAdmin):
     """
     Админка для оплаченных Заказов.
     """
 
     list_display = (
-        'idempotentence_key',
+        'idempotence_key',
         'order',
+        'payment_id',
+        'status',
+        'value',
         'created_at',
     )
     search_fields = ('order',)

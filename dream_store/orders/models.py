@@ -1,4 +1,3 @@
-from email.policy import default
 from django.contrib.auth import get_user_model
 from django.core.exceptions import ValidationError
 from django.db import models
@@ -82,7 +81,7 @@ class Order(models.Model):
     CHOICES = (
         ('ACTIVE', 'Активный'),
         ('ENDED', 'Завершенный'),
-        ('CANCELLED', 'Отмененный')
+        ('CANCELED', 'Отмененный')
     )
 
     customer = models.ForeignKey(
