@@ -1,7 +1,6 @@
 from django.urls import path
 
 from api.views import products_views as product
-from api.views import orders_views as order
 
 
 urlpatterns = [
