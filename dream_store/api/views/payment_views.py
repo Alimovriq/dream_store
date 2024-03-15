@@ -12,11 +12,13 @@ from orders.models import Order
 
 def payment_create(request, order):
     """
-    Создание платежа.
+    Создание платежа, возврат пользователя на страницу заказа
+    после совершения платежа.
     """
 
-    Configuration.account_id = '246787'
-    Configuration.secret_key = 'test_XzRZazXj1M-hFtdvMEeiLiNEtvv1Sqm-J1bEYR61p_Y'
+    # Configuration.account_id = '246787'
+    # Configuration.secret_key = 'test_XzRZazXj1M-hFtdvMEeiLiNEtvv1Sqm-J1bEYR61p_Y'
+    url = f"http://{request.get_host()}/api/v1/orders/{order.pk}/"
 
     payment = Payment.create({
         "amount": {
@@ -25,9 +27,7 @@ def payment_create(request, order):
         },
         "confirmation": {
             "type": "redirect",
-            # "return_url": str(request.get_host())
-            # Поменять url
-            "return_url": "https://www.example.com/return_url"
+            "return_url": url
         },
         "capture": True,
         "description": f"Заказ № {order.pk} для {order.customer}"
