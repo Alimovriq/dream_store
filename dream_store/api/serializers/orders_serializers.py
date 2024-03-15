@@ -83,7 +83,7 @@ class OrderSerializer(serializers.ModelSerializer):
         fields = (
             'id',
             'customer',
-            'products', 
+            'products',
             'total_price',
             'created_at',
             'phone',
@@ -148,5 +148,10 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         shop_basket_obj = Shop_basket.objects.filter(customer=customer)
         shop_basket_obj.delete()
 
-        # Поменять ответ
         return validated_data
+
+    def to_representation(self, instance):
+        rep = super().to_representation(instance)
+        if 'products' in rep:
+            del rep['products']
+        return rep

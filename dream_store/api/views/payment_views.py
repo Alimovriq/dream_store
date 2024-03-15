@@ -1,10 +1,10 @@
 import uuid
 
 from django.shortcuts import get_object_or_404
-from rest_framework import permissions, status
+from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
-from yookassa import Configuration, Payment
+from yookassa import Payment
 
 from api.serializers.paymenet_serializers import OrderPaymentSerializer
 from orders.models import Order
@@ -16,8 +16,6 @@ def payment_create(request, order):
     после совершения платежа.
     """
 
-    # Configuration.account_id = '246787'
-    # Configuration.secret_key = 'test_XzRZazXj1M-hFtdvMEeiLiNEtvv1Sqm-J1bEYR61p_Y'
     url = f"http://{request.get_host()}/api/v1/orders/{order.pk}/"
 
     payment = Payment.create({
@@ -62,4 +60,3 @@ def order_payment(request, pk):
             status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-# Проверить оплату и изменить статус платежа в БД!!
