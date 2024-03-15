@@ -2,6 +2,8 @@ import os
 
 from pathlib import Path
 
+from yookassa import Configuration
+
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 
@@ -155,3 +157,8 @@ DJOSER = {
         'user_create': 'djoser.serializers.UserCreateSerializer',
         'current_user': 'api.serializers.users_serializers.CurrentUserSerializer'},
 }
+
+# YOKKASSA params
+
+Configuration.account_id = '246787'
+Configuration.secret_key = 'test_XzRZazXj1M-hFtdvMEeiLiNEtvv1Sqm-J1bEYR61p_Y'

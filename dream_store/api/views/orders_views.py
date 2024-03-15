@@ -7,6 +7,8 @@ from orders.models import Order
 from api.serializers.orders_serializers import (
     OrderSerializer, OrderCreateSerializer,)
 
+from payment.utils import check_payment
+
 
 class OrderList(ListCreateAPIView):
     """
@@ -34,7 +36,8 @@ class OrderList(ListCreateAPIView):
             request, self.get_serializer, self.get_queryset())
 
     def post(self, request, *args, **kwargs):
-
+        # Переделать: использовать в сериализаторе
+        # to representation и to iternal value(?)
         # Если пользователь передает свои товары, то удалить
         if 'products' in request.data.keys():
             del request.data['products']
@@ -55,3 +58,7 @@ class OrderRetrieve(RetrieveAPIView):
     def get_queryset(self):
         customer = self.request.user
         return Order.objects.filter(customer=customer)
+
+    def get(self, request, *args, **kwargs):
+        check_payment(**kwargs)
+        return self.retrieve(request, *args, **kwargs)
