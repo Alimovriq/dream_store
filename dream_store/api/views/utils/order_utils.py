@@ -40,7 +40,6 @@ def create_order(customer: Any) -> Any:
     для пользователя.
     """
 
-    print('STARTED')
     Order.objects.create(customer=customer)
     qs = Order.objects.all()
     order_obj = qs[::-1][0]
@@ -68,7 +67,7 @@ def post_operations_in_orders(request: Any, serializer: Any) -> Response:
             if serializer.is_valid():
                 serializer.save()
                 return Response(
-                    serializer.data,
+                    {"detail": f"Заказ № {order_obj.pk} создан."},
                     status=status.HTTP_201_CREATED)
             order_obj.delete()
             return Response(

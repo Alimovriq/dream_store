@@ -19,11 +19,9 @@ class OrderList(ListCreateAPIView):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        # Надо ли проверку метода?
-        if self.request.method in SAFE_METHODS:
-            return Order.objects.filter(
-                customer=self.request.user).order_by(
-                    '-created_at')
+        return Order.objects.filter(
+            customer=self.request.user).order_by(
+                '-created_at')
 
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
@@ -36,12 +34,6 @@ class OrderList(ListCreateAPIView):
             request, self.get_serializer, self.get_queryset())
 
     def post(self, request, *args, **kwargs):
-        # Переделать: использовать в сериализаторе
-        # to representation и to iternal value(?)
-        # Если пользователь передает свои товары, то удалить
-        if 'products' in request.data.keys():
-            del request.data['products']
-
         return process_order(
             request, self.get_serializer)
 
