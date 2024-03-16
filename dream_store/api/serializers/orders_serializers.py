@@ -1,4 +1,5 @@
 from django.contrib.auth import get_user_model
+from django.db import transaction
 from rest_framework import serializers
 from rest_framework.validators import UniqueTogetherValidator
 
@@ -131,22 +132,23 @@ class OrderCreateSerializer(serializers.ModelSerializer):
         email = validated_data.get('email')
         comment = validated_data.get('comment', 'null')
 
-        for item in products:
-            OrderItems.objects.create(
-                order=item['order'],
-                product=item['product'],
-                quantity=item['quantity']
-            )
+        with transaction.atomic():
+            for item in products:
+                OrderItems.objects.create(
+                    order=item['order'],
+                    product=item['product'],
+                    quantity=item['quantity']
+                )
 
-        order_obj = Order.objects.all()[::-1][0]
-        order_obj.address = address
-        order_obj.phone = phone
-        order_obj.email = email
-        order_obj.comment = comment
-        order_obj.save()
+            order_obj = Order.objects.all()[::-1][0]
+            order_obj.address = address
+            order_obj.phone = phone
+            order_obj.email = email
+            order_obj.comment = comment
+            order_obj.save()
 
-        shop_basket_obj = Shop_basket.objects.filter(customer=customer)
-        shop_basket_obj.delete()
+            shop_basket_obj = Shop_basket.objects.filter(customer=customer)
+            shop_basket_obj.delete()
 
         return validated_data
 
