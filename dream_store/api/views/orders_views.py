@@ -7,7 +7,7 @@ from orders.models import Order
 from api.serializers.orders_serializers import (
     OrderSerializer, OrderCreateSerializer,)
 
-from payment.utils import check_payment
+from api.views.utils.payment_utils import check_payment
 
 
 class OrderList(ListCreateAPIView):

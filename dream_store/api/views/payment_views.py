@@ -59,4 +59,3 @@ def order_payment(request, pk):
             yookassa_response.confirmation,
             status.HTTP_201_CREATED)
     return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
