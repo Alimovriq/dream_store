@@ -5,7 +5,15 @@ from .models import Order, OrderItems, OrderRefund, OrderItemsRefund
 
 class OrderProductInline(admin.TabularInline):
     model = OrderItems
-    extra = 1
+    extra = 0
+
+
+class OrderRefundProductInLine(admin.TabularInline):
+    model = OrderItemsRefund
+    verbose_name = 'Возвращаемый товар'
+    verbose_name_plural = 'Возвращаемые товары'
+    fields = ('order_item', 'quantity',)
+    extra = 0
 
 
 @admin.register(Order)
@@ -64,7 +72,7 @@ class OrderItemsAdmin(admin.ModelAdmin):
 @admin.register(OrderRefund)
 class OrderRefundAdmin(admin.ModelAdmin):
     """
-    Админка для модеели возврата.
+    Админка для модели возврата.
     """
 
     list_display = (
@@ -75,6 +83,7 @@ class OrderRefundAdmin(admin.ModelAdmin):
     )
     list_filter = ('order',)
     search_fields = ('order',)
+    inlines = (OrderRefundProductInLine,)
 
 
 @admin.register(OrderItemsRefund)

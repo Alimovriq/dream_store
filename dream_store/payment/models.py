@@ -7,7 +7,7 @@ from orders.models import Order
 
 class OrderPayment(models.Model):
     """
-    Модель оплат заказов.
+    Модель оплаты заказов.
     """
 
     idempotence_key = models.UUIDField(

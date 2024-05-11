@@ -8,69 +8,74 @@ from products.models import Product
 USER = get_user_model()
 
 
-class OrderItemsRefund(models.Model):
-    """
-    Модель с конкретными позициями
-    для отказа в Заказе.
-    """
+# class OrderItemsRefund(models.Model):
+#     """
+#     Модель с конкретными позициями
+#     для отказа в Заказе.
+#     """
 
-    order_item = models.ForeignKey(
-        'OrderItems',
-        on_delete=models.CASCADE,
-        verbose_name='Возвращаемый товар',
-        related_name='refunds',
-        help_text='id товара в Заказе'
-    )
-    refund = models.ForeignKey(
-        'OrderRefund',
-        on_delete=models.CASCADE,
-        verbose_name='Возврат',
-        related_name='orderitemsrefunds',
-        help_text='id возвращаемого Заказа'
-    )
-    quantity = models.PositiveBigIntegerField(
-        verbose_name='Количество',
-        help_text='Количество'
-    )
+#     # CHOICES = (
+#     #     ('APPPROVED', 'Согласовано'),
+#     #     ('CANCELLED', 'Отказано')
+#     # )
 
-    class Meta:
-        verbose_name = 'Возвращаемый товар'
-        verbose_name_plural = 'Возвращаемые товары'
+#     order_item = models.ForeignKey(
+#         'OrderItems',
+#         on_delete=models.CASCADE,
+#         verbose_name='Возвращаемый товар',
+#         related_name='refunds',
+#         help_text='id товара в Заказе'
+#     )
+#     refund = models.ForeignKey(
+#         'OrderRefund',
+#         on_delete=models.CASCADE,
+#         verbose_name='Возврат',
+#         related_name='orderitemsrefunds',
+#         help_text='id возвращаемого Заказа'
+#     )
+#     quantity = models.PositiveBigIntegerField(
+#         verbose_name='Количество',
+#         help_text='Количество'
+#     )
 
-    def __str__(self) -> str:
-        return f'Вовзарат {self.order_item.name} - {self.quantity}'
+#     class Meta:
+#         verbose_name = 'Возвращаемый товар'
+#         verbose_name_plural = 'Возвращаемые товары'
+
+#     def __str__(self) -> str:
+#         return f'Вовзарат {self.order_item.product.name} - {self.quantity}'
 
 
-class OrderRefund(models.Model):
-    """
-    Модель для отказа от Заказа (возврат).
-    """
+# class OrderRefund(models.Model):
+#     """
+#     Модель для отказа от Заказа (возврат).
+#     """
 
-    order = models.ForeignKey(
-        'Order',
-        on_delete=models.CASCADE,
-        verbose_name='Заказ',
-        help_text='id Заказа',
-        related_name='refunds'
-    )
-    created_at = models.DateTimeField(
-        verbose_name='Дата создания',
-        auto_now_add=True,
-        help_text='Дата создания'
-    )
-    comment = models.TextField(
-        verbose_name='Комментарий',
-        blank=True,
-        null=True,
-        help_text='текст для комментария'
-    )
+#     order = models.ForeignKey(
+#         'Order',
+#         on_delete=models.CASCADE,
+#         verbose_name='Заказ',
+#         help_text='id Заказа',
+#         related_name='refunds'
+#     )
+#     created_at = models.DateTimeField(
+#         verbose_name='Дата создания',
+#         auto_now_add=True,
+#         help_text='Дата создания'
+#     )
+#     comment = models.TextField(
+#         verbose_name='Комментарий',
+#         blank=True,
+#         null=True,
+#         help_text='текст для комментария'
+#     )
 
-    class Meta:
-        verbose_name = 'Возврат'
-        verbose_name_plural = 'Возвраты'
+#     class Meta:
+#         verbose_name = 'Возврат'
+#         verbose_name_plural = 'Возвраты'
 
-    def __str__(self) -> str:
-        return f'Создан возврат № {self.pk}'
+#     def __str__(self) -> str:
+#         return f'Возврат № {self.pk}'
 
 
 class Order(models.Model):
@@ -80,8 +85,8 @@ class Order(models.Model):
 
     CHOICES = (
         ('ACTIVE', 'Активный'),
-        ('ENDED', 'Завершенный'),
-        ('CANCELED', 'Отмененный')
+        ('FINISHED', 'Завершенный'),
+        ('CANCELLED', 'Отмененный')
     )
 
     customer = models.ForeignKey(
@@ -178,3 +183,89 @@ class OrderItems(models.Model):
         if self.quantity > queryset.first().quantity:
             raise ValidationError(
                 f'Недостаточное количество товара {self.product.name} в наличии.')
+
+
+class OrderRefund(models.Model):
+    """
+    Модель для отказа от Заказа (возврат).
+    """
+
+    order = models.ForeignKey(
+        Order,
+        on_delete=models.CASCADE,
+        verbose_name='Заказ',
+        help_text='id Заказа',
+        related_name='refunds'
+    )
+    created_at = models.DateTimeField(
+        verbose_name='Дата создания',
+        auto_now_add=True,
+        help_text='Дата создания'
+    )
+    comment = models.TextField(
+        verbose_name='Комментарий',
+        blank=True,
+        null=True,
+        help_text='текст для комментария'
+    )
+
+    class Meta:
+        verbose_name = 'Возврат'
+        verbose_name_plural = 'Возвраты'
+
+    def __str__(self) -> str:
+        return f'Возврат № {self.pk}'
+
+
+class OrderItemsRefund(models.Model):
+    """
+    Модель с конкретными позициями
+    для отказа в Заказе.
+    """
+
+    refund = models.ForeignKey(
+        OrderRefund,
+        on_delete=models.CASCADE,
+        verbose_name='Возврат',
+        related_name='orderitemsrefunds',
+        help_text='id возвращаемого Заказа'
+    )
+    order_item = models.ForeignKey(
+        OrderItems,
+        on_delete=models.CASCADE,
+        # Ограничить выбор товаров == заказ
+        # limit_choices_to={
+        #     'order': models.F('order__refunds')
+        # },
+        verbose_name='Возвращаемый товар',
+        # related_name='refunds',
+        help_text='id товара в Заказе',
+    )
+    quantity = models.PositiveBigIntegerField(
+        verbose_name='Количество',
+        help_text='Количество',
+    )
+
+    class Meta:
+        verbose_name = 'Возвращаемый товар'
+        verbose_name_plural = 'Возвращаемые товары'
+
+    def __str__(self) -> str:
+        return f'Возварат {self.order_item.product.name} - {self.quantity}'
+
+    def clean(self):
+        """
+        Проверка на количество товара на в заказе.
+        """
+
+        if self.order_item.order != self.refund.order:
+            raise ValidationError(
+                'Вы не можете возвратить товар из другого заказа')
+
+        if self.quantity > self.order_item.quantity:
+            raise ValidationError(
+                'Количество возвращаемого товара не может быть больше купленного')
+
+    def save(self, *args, **kwargs):
+        self.clean()
+        super().save(*args, **kwargs)
