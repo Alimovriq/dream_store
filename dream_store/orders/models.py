@@ -7,6 +7,11 @@ from products.models import Product
 
 USER = get_user_model()
 
+CHOICES = (
+    ('ACTIVE', 'Активный'),
+    ('FINISHED', 'Завершенный'),
+    ('CANCELLED', 'Отмененный')
+)
 
 # class OrderItemsRefund(models.Model):
 #     """
@@ -82,12 +87,6 @@ class Order(models.Model):
     """
     Общая модель для заказов.
     """
-
-    CHOICES = (
-        ('ACTIVE', 'Активный'),
-        ('FINISHED', 'Завершенный'),
-        ('CANCELLED', 'Отмененный')
-    )
 
     customer = models.ForeignKey(
         USER,
@@ -208,6 +207,11 @@ class OrderRefund(models.Model):
         null=True,
         help_text='текст для комментария'
     )
+    status = models.CharField(
+        verbose_name='Статус возврата',
+        choices=CHOICES,
+        default=CHOICES[0][0],
+        max_length=300)
 
     class Meta:
         verbose_name = 'Возврат'
