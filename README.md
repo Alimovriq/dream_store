@@ -20,7 +20,7 @@ cd dream_store
 pip install -r requirements.txt
 ```
 
-* применить миграции:
+* применить миграции (PostgreSQL):
 ```bash
 python manage.py migrate
 ```

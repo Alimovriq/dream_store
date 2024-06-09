@@ -12,7 +12,7 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 INSTALLED_APPS = [
     'django.contrib.admin',
@@ -64,10 +64,21 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'dream_store.wsgi.application'
 
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.sqlite3',
+#         'NAME': BASE_DIR / 'db.sqlite3',
+#     }
+# }
+
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'ENGINE': os.getenv('DB_ENGINE'),
+        'NAME':  os.getenv('DB_NAME'),
+        'USER':  os.getenv('POSTGRES_USER'),
+        'PASSWORD':  os.getenv('POSTGRES_PASSWORD'),
+        'HOST':  os.getenv('DB_HOST'),
+        'PORT':  os.getenv('DB_PORT'),
     }
 }
 
@@ -100,7 +111,8 @@ AUTH_USER_MODEL = 'users.User'
 
 STATIC_URL = '/static/'
 
-STATIC_ROOT = BASE_DIR / 'collected_static'
+STATIC_ROOT = os.path.join(BASE_DIR, 'static')
+# STATIC_ROOT = BASE_DIR / 'collected_static'
 
 MEDIA_URL = '/media/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
