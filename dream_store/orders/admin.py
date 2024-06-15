@@ -79,11 +79,21 @@ class OrderRefundAdmin(admin.ModelAdmin):
         'pk',
         'order',
         'created_at',
+        'total_refund',
         'comment',
+        'status',
     )
     list_filter = ('order',)
     search_fields = ('order',)
     inlines = (OrderRefundProductInLine,)
+
+    def total_refund(self, obj):
+        if orderitem_obj := OrderItemsRefund.objects.filter(refund=obj):
+            return [
+                i.order_item.product.price * i.quantity for i in orderitem_obj]
+        return 'null'
+
+    total_refund.short_description = 'Сумма возврата, руб.'
 
 
 @admin.register(OrderItemsRefund)
@@ -97,6 +107,12 @@ class OrderRefundItemsAdmin(admin.ModelAdmin):
         'order_item',
         'refund',
         'quantity',
+        'price_refund'
     )
     list_filter = ('order_item', 'refund',)
     search_filter = ('order_item', 'refund',)
+
+    def price_refund(self, obj):
+        return obj.order_item.product.price * obj.quantity
+
+    price_refund.short_description = 'Сумма возврата, руб.'
