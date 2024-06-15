@@ -1,19 +1,6 @@
 from rest_framework import serializers
 
-from orders.models import OrderRefund, OrderItemsRefund
-
-
-class OrderRefundSerializerCreate(serializers.ModelSerializer):
-    """
-    Сериализатор при создании возврата для товаров.
-    """
-
-    class Meta:
-        model = OrderRefund
-        fields = (
-            'order',
-            'comment',
-        )
+from orders.models import OrderRefund, OrderItemsRefund, OrderItems
 
 
 class OrderItemsRefundSerializerCreate(serializers.ModelSerializer):
@@ -21,23 +8,53 @@ class OrderItemsRefundSerializerCreate(serializers.ModelSerializer):
     Сериализатор при создании товаров для возврата.
     """
 
-    refund = OrderRefundSerializerCreate()
-    order_item = serializers.CharField(source='order_item.product.name')
+    # order_item = serializers.CharField(source='order_item.product.name')
 
     class Meta:
         model = OrderItemsRefund
         fields = (
-            'refund',
             'order_item',
             'quantity',
         )
 
+
+class OrderRefundSerializerCreate(serializers.ModelSerializer):
+    """
+    Сериализатор при создании возврата для товаров.
+    """
+
+    orderitemsrefunds = OrderItemsRefundSerializerCreate(many=True)
+
+    class Meta:
+        model = OrderRefund
+        fields = (
+            'id',
+            'order',
+            'comment',
+            'orderitemsrefunds',
+        )
+
     def create(self, validated_data):
-        order_obj = validated_data.pop('refund')['order']
-        order_refund = OrderRefund.objects.get_or_create(order=order_obj)
-        for item in validated_data:
-            obj = OrderItemsRefund.objects.create(refund=order_refund, **item)
-        return obj
+        items = validated_data.pop('orderitemsrefunds')
+        order_ref_obj = OrderRefund.objects.get_or_create(**validated_data)
+        for item in items:
+            OrderItemsRefund.objects.get_or_create(
+                refund=order_ref_obj[0], **item)
+        return order_ref_obj[0]
+
+    # def validate(self, data):
+    #     print(f'DATA {data}')
+    #     items = data.get('orderitemsrefunds')
+    #     for item in items:
+    #         print('ВНИМАНИЕ')
+    #         print(OrderItems.objects.filter(
+    #             order=data.get('order').pk, product=item.get('order_item').pk))
+    #         if not OrderItems.objects.filter(
+    #             order=data.get('order').pk, product=item.get('order_item').pk):
+    #             raise serializers.ValidationError(
+    #                 'Данного товара нет в указанном Заказе')
+    #     print('ПРОВАЛИДИРОВАЛ!')
+    #     return data
 
 
 class OrderItemsRefundSerializer(serializers.ModelSerializer):
@@ -107,7 +124,7 @@ class OrderRefundSerializer(serializers.ModelSerializer):
     """
 
     refund_items = serializers.SerializerMethodField()
-    
+
     class Meta:
         model = OrderRefund
         fields = (
@@ -118,13 +135,6 @@ class OrderRefundSerializer(serializers.ModelSerializer):
             'comment',
             'status',
         )
-
-    # def create(self, validated_data):
-    #     refund_items_data = validated_data.pop('refund_items')
-    #     order_refund = OrderRefund.objects.create(**validated_data)
-    #     for item_data in refund_items_data:
-    #         OrderItemsRefund.objects.create(refund=order_refund, **item_data)
-    #     return order_refund
 
     # def to_representation(self, instance):
     #     ret = super().to_representation(instance)
