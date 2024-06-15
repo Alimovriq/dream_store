@@ -6,7 +6,7 @@ from rest_framework.response import Response
 
 from orders.models import Order, OrderRefund, OrderItemsRefund
 from api.serializers.orders_refund_serializers import (
-    OrderRefundSerializer, OrderItemsRefundSerializerCreate,)
+    OrderRefundSerializer, OrderRefundSerializerCreate,)
 
 
 class OrderRefundListCreateView(ListCreateAPIView):
@@ -24,7 +24,7 @@ class OrderRefundListCreateView(ListCreateAPIView):
     def get_serializer_class(self):
         if self.request.method in SAFE_METHODS:
             return OrderRefundSerializer
-        return OrderItemsRefundSerializerCreate
+        return OrderRefundSerializerCreate
 
     def get_serializer_context(self):
         context = super().get_serializer_context()
