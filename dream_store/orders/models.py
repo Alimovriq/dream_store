@@ -13,75 +13,6 @@ CHOICES = (
     ('CANCELLED', 'Отмененный')
 )
 
-# class OrderItemsRefund(models.Model):
-#     """
-#     Модель с конкретными позициями
-#     для отказа в Заказе.
-#     """
-
-#     # CHOICES = (
-#     #     ('APPPROVED', 'Согласовано'),
-#     #     ('CANCELLED', 'Отказано')
-#     # )
-
-#     order_item = models.ForeignKey(
-#         'OrderItems',
-#         on_delete=models.CASCADE,
-#         verbose_name='Возвращаемый товар',
-#         related_name='refunds',
-#         help_text='id товара в Заказе'
-#     )
-#     refund = models.ForeignKey(
-#         'OrderRefund',
-#         on_delete=models.CASCADE,
-#         verbose_name='Возврат',
-#         related_name='orderitemsrefunds',
-#         help_text='id возвращаемого Заказа'
-#     )
-#     quantity = models.PositiveBigIntegerField(
-#         verbose_name='Количество',
-#         help_text='Количество'
-#     )
-
-#     class Meta:
-#         verbose_name = 'Возвращаемый товар'
-#         verbose_name_plural = 'Возвращаемые товары'
-
-#     def __str__(self) -> str:
-#         return f'Вовзарат {self.order_item.product.name} - {self.quantity}'
-
-
-# class OrderRefund(models.Model):
-#     """
-#     Модель для отказа от Заказа (возврат).
-#     """
-
-#     order = models.ForeignKey(
-#         'Order',
-#         on_delete=models.CASCADE,
-#         verbose_name='Заказ',
-#         help_text='id Заказа',
-#         related_name='refunds'
-#     )
-#     created_at = models.DateTimeField(
-#         verbose_name='Дата создания',
-#         auto_now_add=True,
-#         help_text='Дата создания'
-#     )
-#     comment = models.TextField(
-#         verbose_name='Комментарий',
-#         blank=True,
-#         null=True,
-#         help_text='текст для комментария'
-#     )
-
-#     class Meta:
-#         verbose_name = 'Возврат'
-#         verbose_name_plural = 'Возвраты'
-
-#     def __str__(self) -> str:
-#         return f'Возврат № {self.pk}'
-
 
 class Order(models.Model):
     """
@@ -237,12 +168,7 @@ class OrderItemsRefund(models.Model):
     order_item = models.ForeignKey(
         OrderItems,
         on_delete=models.CASCADE,
-        # Ограничить выбор товаров == заказ
-        # limit_choices_to={
-        #     'order': models.F('order__refunds')
-        # },
         verbose_name='Возвращаемый товар',
-        # related_name='refunds',
         help_text='id товара в Заказе',
     )
     quantity = models.PositiveBigIntegerField(
