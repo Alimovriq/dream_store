@@ -1,6 +1,6 @@
 from rest_framework import serializers
 
-from orders.models import OrderRefund, OrderItemsRefund, OrderItems
+from orders.models import OrderRefund, OrderItemsRefund
 
 
 class OrderItemsRefundSerializerCreate(serializers.ModelSerializer):
@@ -41,20 +41,6 @@ class OrderRefundSerializerCreate(serializers.ModelSerializer):
             OrderItemsRefund.objects.get_or_create(
                 refund=order_ref_obj[0], **item)
         return order_ref_obj[0]
-
-    # def validate(self, data):
-    #     print(f'DATA {data}')
-    #     items = data.get('orderitemsrefunds')
-    #     for item in items:
-    #         print('ВНИМАНИЕ')
-    #         print(OrderItems.objects.filter(
-    #             order=data.get('order').pk, product=item.get('order_item').pk))
-    #         if not OrderItems.objects.filter(
-    #             order=data.get('order').pk, product=item.get('order_item').pk):
-    #             raise serializers.ValidationError(
-    #                 'Данного товара нет в указанном Заказе')
-    #     print('ПРОВАЛИДИРОВАЛ!')
-    #     return data
 
 
 class OrderItemsRefundSerializer(serializers.ModelSerializer):
