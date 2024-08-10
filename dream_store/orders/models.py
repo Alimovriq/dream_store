@@ -47,6 +47,8 @@ class Order(models.Model):
         help_text='Укажите Email')
     comment = models.TextField(
         max_length=500,
+        blank=True,
+        null=True,
         verbose_name='Комментарий',
         help_text='Введите комментарий')
     address = models.TextField(
@@ -102,7 +104,7 @@ class OrderItems(models.Model):
         ]
 
     def __str__(self) -> str:
-        return f'{self.product.name} ({self.quantity})'
+        return f'Заказ №{self.order.pk} - {self.product.name} x{self.quantity}'
 
     def clean(self):
         """
@@ -181,7 +183,7 @@ class OrderItemsRefund(models.Model):
         verbose_name_plural = 'Возвращаемые товары'
 
     def __str__(self) -> str:
-        return f'Возварат {self.order_item.product.name} - {self.quantity}'
+        return f'Возврат {self.order_item.product.name} - {self.quantity}'
 
     def clean(self):
         """

@@ -1,4 +1,3 @@
-from email.policy import default
 from django.db import models
 from django.contrib.auth import get_user_model
 
@@ -12,7 +11,7 @@ class News(models.Model):
     """
 
     title = models.CharField(
-        max_length=250,
+        max_length=255,
         verbose_name='Заголовок')
     text = models.TextField(
         verbose_name='Текст')

@@ -28,6 +28,7 @@ class CountryProducyAdmin(admin.ModelAdmin):
     """
     Админка для стран.
     """
+
     list_display = (
         'pk',
         'name',
