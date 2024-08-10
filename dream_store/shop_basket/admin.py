@@ -33,9 +33,9 @@ class ShopBasketAdmin(admin.ModelAdmin):
 
         cartitem = Shop_basket_items.objects.filter(shop_basket=obj)
         quantity = 0
-        for item in cartitem:
-            if item.product:
-                quantity += 1
+        for _ in cartitem:
+            # if item.product:
+            quantity += 1
         return quantity
 
     @admin.display(description='Итоговая стоимость в руб.')
@@ -47,29 +47,15 @@ class ShopBasketAdmin(admin.ModelAdmin):
         cartitem = Shop_basket_items.objects.filter(shop_basket=obj)
         total = 0
         for item in cartitem:
-            if item.product:
-                total += item.product.price * item.quantity
+            # if item.product:
+            total += item.product.price * item.quantity
         return total
-
-# @admin.display(description='Товары в корзине')
-# def display_products(self, obj):
-#     """
-#     Отображает товары в корзине
-#     """
-
-#     cartitem = Shop_basket_items.objects.filter(shop_basket=obj)
-#     print(cartitem)
-#     print("HELLO")
-#     products_list = []
-#     for item in cartitem:
-#         products_list.append(item.product.name)
-#     return products_list
 
 
 @admin.register(Shop_basket_items)
 class ShopBasketItemsAdmin(admin.ModelAdmin):
     """
-    Админка для объектов корзины.
+    Админка товаров для корзин.
     """
 
     list_display = (

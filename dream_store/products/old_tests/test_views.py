@@ -11,9 +11,11 @@ from products.models import (
     Category,
     Brand,
     CountryProduct,
-    Product,
+    Product,)
+from shop_basket.models import (
     Shop_basket,
-    Shop_basket_items,
+    Shop_basket_items,)
+from orders.models import (
     Order,
     OrderItems,)
 
