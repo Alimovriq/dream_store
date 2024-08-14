@@ -163,15 +163,18 @@ class Shop_basket_itemsModelTest(TestCase):
             f'Объект корзины с Iphone 15 256 gb black в кол-ве 8 ед.'
         )
 
-    # def test_shop_basket_items_model_product_quantity_exists(self):
-    #     """
-    #     Тест на количество доступного товара для добавления в 
-    #     корзину Пользователя.
-    #     """
+    def test_shop_basket_items_model_product_quantity_exists(self):
+        """
+        Тест на количество доступного товара для добавления в
+        корзину Пользователя.
+        """
 
-    #     shop_basket_items = Shop_basket_itemsModelTest.shop_basket_items_obj
-    #     try:
-    #         shop_basket_items.quantity = 50
-    #     except ValidationError:
-    #         print('lol?')
-    #         return self.assertTrue(shop_basket_items.quantity == 5)
+        shop_basket_items = Shop_basket_itemsModelTest.shop_basket_items_obj
+        shop_basket_items.quantity = 999
+        try:
+            shop_basket_items.clean()
+        except ValidationError as e:
+            self.assertEqual(type(e), ValidationError)
+            self.assertEqual(
+                e.message,
+                f'Недостаточное количество товара {shop_basket_items.product} в наличии.')
