@@ -1,5 +1,6 @@
 from django.test import TestCase, Client
 from django.contrib.auth import get_user_model
+from django.db.utils import IntegrityError
 from django.core.exceptions import ValidationError
 
 from shop_basket.models import Shop_basket, Shop_basket_items
@@ -171,10 +172,26 @@ class Shop_basket_itemsModelTest(TestCase):
 
         shop_basket_items = Shop_basket_itemsModelTest.shop_basket_items_obj
         shop_basket_items.quantity = 999
-        try:
+        msg = f'Недостаточное количество товара {shop_basket_items.product} в наличии.'
+
+        with self.assertRaisesMessage(ValidationError, msg):
             shop_basket_items.clean()
-        except ValidationError as e:
-            self.assertEqual(type(e), ValidationError)
-            self.assertEqual(
-                e.message,
-                f'Недостаточное количество товара {shop_basket_items.product} в наличии.')
+
+    def test_shop_basket_items_model_unique_product_shop_basket_objs(self):
+        """
+        Тест на уникальность товара в корзине (товары не дублируются).
+        """
+
+        shop_basket_obj = Shop_basket_itemsModelTest.shop_basket_obj
+        product = Shop_basket_itemsModelTest.product
+
+        with self.assertRaises(IntegrityError):
+            Shop_basket_items.objects.create(
+                shop_basket=shop_basket_obj,
+                product=product,
+                quantity=1
+            )
+
+    @classmethod
+    def tearDownClass(cls) -> None:
+        super().tearDownClass()
