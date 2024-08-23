@@ -12,7 +12,7 @@ USER = get_user_model()
 
 class Shop_BasketModelTest(TestCase):
     """
-    Тестирование основной модели Shop_basket
+    Тестирование основной модели Shop_basket.
     """
 
     @classmethod
@@ -74,8 +74,8 @@ class Shop_BasketModelTest(TestCase):
 
     def test_shop_basket_model_have_correct_name(self):
         """
-        Тест на корректность отображения __str__ у 
-        модели Shop_basket.
+        Тест на корректность отображения __str__
+        у модели Shop_basket.
         """
 
         shop_basket = Shop_BasketModelTest.shop_basket_obj
